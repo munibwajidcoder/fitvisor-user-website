@@ -37,7 +37,7 @@ export default function Navbar() {
         </Link>
       </nav>
 
-      <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <div className="header-actions">
         {/* Language Switch */}
         <div className="fv-lang-switch">
           <button
@@ -57,7 +57,15 @@ export default function Navbar() {
           </button>
         </div>
 
-        <Link href="/login" style={{ fontSize: "13.5px", fontWeight: 600, color: "#1e293b", textDecoration: "none", marginRight: "4px" }}>
+        {/* Mobile-only Sign In (preserves the mobile layout untouched) */}
+        <Link href="/login" className="nav-signin-link nav-signin-mobile-only">
+          {lang === "FR" ? "Connexion" : "Sign In"}
+        </Link>
+      </div>
+
+      {/* Desktop Auth & CTA: Sign In and Create My Avatar placed side-by-side */}
+      <div className="site-header-cta-wrap">
+        <Link href="/login" className="nav-signin-link nav-signin-desktop-only">
           {lang === "FR" ? "Connexion" : "Sign In"}
         </Link>
         <Link href="/register" className="btn-primary-cta">

@@ -144,9 +144,9 @@ export default function VerificationPage() {
           </button>
         </div>
 
-        {/* Primary CTA Button: Confirm & Fine-Tune */}
-        <Link href="/measurements" className="ver-confirm-btn">
-          <span>Confirm &amp; Fine-Tune Measurements</span>
+        {/* Primary CTA Button: Confirm & Generate 3D Avatar */}
+        <Link href="/generating" className="ver-confirm-btn">
+          <span>Confirm &amp; Generate 3D Avatar</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12h14" />
             <path d="m12 5 7 7-7 7" />

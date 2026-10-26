@@ -134,6 +134,35 @@ img {
   flex-shrink: 0;
 }
 
+.site-header-cta-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.nav-signin-mobile-only {
+  display: none !important;
+}
+
+.nav-signin-desktop-only {
+  display: inline-flex !important;
+  align-items: center;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1e293b;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-signin-desktop-only:hover {
+  color: #f04b55;
+  background: rgba(240, 75, 85, 0.06);
+}
+
 .btn-primary-cta {
   background-color: var(--coral);
   color: #ffffff;
@@ -876,22 +905,102 @@ img {
   }
 
   .site-header {
-    padding: 10px 18px;
-    margin: 10px 0 20px 0;
-    min-height: 54px;
+    padding: 12px 16px;
+    margin: 8px 0 16px 0;
+    min-height: auto;
+    border-radius: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    row-gap: 10px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
   }
 
-  .nav-links {
+  .site-header .fitvisor-brand-logo {
+    order: 1;
+  }
+
+  .site-header .fitvisor-brand-logo img {
+    height: 26px !important;
+  }
+
+  .site-header .header-actions {
+    order: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+  }
+
+  .nav-signin-desktop-only {
+    display: none !important;
+  }
+
+  .nav-signin-mobile-only {
+    display: inline-flex !important;
+    white-space: nowrap;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e293b;
+    text-decoration: none;
+  }
+
+  .nav-signin-link {
+    white-space: nowrap;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e293b;
+    text-decoration: none;
+  }
+
+  .site-header-cta-wrap {
+    order: 3;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .site-header-cta-wrap .btn-primary-cta {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 18px;
+    font-size: 13.5px;
+    font-weight: 700;
+    border-radius: 9999px;
+  }
+
+  .site-header .nav-links {
+    order: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 20px;
+    padding: 8px 4px 2px 4px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .site-header .nav-links::-webkit-scrollbar {
     display: none;
   }
 
-  .fitvisor-brand-logo img {
-    height: 28px !important;
-  }
-
-  .btn-primary-cta {
-    padding: 9px 16px;
+  .site-header .nav-link {
     font-size: 12.5px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+    text-decoration: none;
   }
 
   .hero-visual-container {
@@ -904,6 +1013,14 @@ img {
     max-width: 480px;
     margin: 0 auto;
     gap: 18px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .feature-card {
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .footer-content {
@@ -926,24 +1043,12 @@ img {
 
 @media (max-width: 640px) {
   .page-container {
-    padding: 0 12px;
+    padding: 0 16px;
   }
 
   .site-header {
-    padding: 8px 16px;
+    padding: 12px 14px;
     margin: 8px 0 16px 0;
-    min-height: 50px;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-  }
-
-  .fitvisor-brand-logo img {
-    height: 25px !important;
-  }
-
-  .btn-primary-cta {
-    padding: 8px 14px;
-    font-size: 12px;
-    font-weight: 600;
   }
 
   .hero-title {
@@ -1045,24 +1150,31 @@ img {
 
 @media (max-width: 380px) {
   .page-container {
-    padding: 0 8px;
+    padding: 0 10px;
   }
 
   .site-header {
-    padding: 6px 12px;
+    padding: 10px 12px;
     margin: 6px 0 12px 0;
     gap: 8px;
-    min-height: 46px;
+    min-height: auto;
+    border-radius: 18px;
   }
 
-  .fitvisor-brand-logo img {
+  .site-header .fitvisor-brand-logo img {
     height: 22px !important;
   }
 
-  .btn-primary-cta {
-    padding: 6px 11px;
-    font-size: 11px;
+  .site-header .btn-primary-cta {
+    padding: 9px 12px;
+    font-size: 12px;
     font-weight: 700;
+    width: 100%;
+  }
+
+  .features-grid {
+    padding: 0 4px;
+    gap: 14px;
   }
 
   .hero-title {
@@ -3271,7 +3383,10 @@ img {
   position: relative;
   width: 100vw;
   height: 100vh;
-  min-height: 640px;
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100vh;
+  max-height: 100dvh;
   overflow: hidden;
   background: #090c14;
   display: flex;
@@ -3328,17 +3443,26 @@ img {
   position: relative;
   z-index: 20;
   width: 100%;
-  padding: 22px 36px;
+  padding: 16px 36px 8px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
-.sc-logo-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
+.sc-topbar-spacer {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .sc-topbar {
+    padding: 12px 16px 6px 16px;
+  }
+
+  .sc-topbar-spacer {
+    display: none;
+  }
 }
 
 .sc-logo-text {
@@ -3469,17 +3593,21 @@ img {
 .sc-viewfinder-stage {
   position: relative;
   z-index: 10;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  padding: 6px 16px;
+  overflow: hidden;
 }
 
 .sc-bounding-box {
   position: relative;
-  width: 420px;
-  height: 580px;
+  width: min(390px, 88vw);
+  height: min(500px, calc(100vh - 170px));
+  max-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3558,8 +3686,9 @@ img {
 /* Hologram Avatar */
 .sc-hologram-wrap {
   position: relative;
-  width: 330px;
-  height: 520px;
+  width: min(320px, 80vw);
+  height: 100%;
+  max-height: 460px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -3649,10 +3778,12 @@ img {
   width: 100%;
   background: #111520;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
-  padding: 16px 36px 18px 36px;
+  padding: 10px 32px 14px 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .sc-dock-inner {
@@ -3661,6 +3792,52 @@ img {
   justify-content: space-between;
   width: 100%;
   max-width: 860px;
+}
+
+.sc-dock-balanced {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  max-width: 940px;
+}
+
+.sc-center-cluster {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin: 0 auto;
+}
+
+.sc-dock-right-spacer {
+  grid-column: 3;
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .sc-bottom-dock {
+    padding: 8px 16px 12px 16px;
+  }
+
+  .sc-dock-balanced {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .sc-center-cluster {
+    width: 100%;
+    justify-content: center;
+    gap: 24px;
+    margin: 0 auto;
+  }
+
+  .sc-dock-right-spacer {
+    display: none;
+  }
 }
 
 /* Flip Camera Button */
@@ -3772,14 +3949,23 @@ img {
   background: #252e42;
 }
 
-/* Upload Option */
 .sc-upload-option {
+  grid-column: 1;
+  justify-self: start;
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: #cbd5e1;
   transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+@media (max-width: 680px) {
+  .sc-upload-option {
+    justify-self: center;
+    justify-content: center;
+  }
 }
 
 .sc-upload-option:hover {
@@ -4517,7 +4703,8 @@ img {
 /* Primary Confirm CTA Button */
 .ver-confirm-btn {
   width: 100%;
-  height: 50px;
+  min-height: 52px;
+  height: auto;
   background: var(--coral);
   color: #ffffff;
   border-radius: 12px;
@@ -4526,11 +4713,24 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   gap: 10px;
+  padding: 12px 20px;
+  box-sizing: border-box;
   text-decoration: none;
   transition: all 0.2s ease;
   box-shadow: 0 6px 20px rgba(240, 75, 85, 0.32);
   margin-bottom: 14px;
+}
+
+.ver-confirm-btn span {
+  display: inline-block;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.ver-confirm-btn svg {
+  flex-shrink: 0;
 }
 
 .ver-confirm-btn:hover {
@@ -5170,18 +5370,59 @@ img {
   border-bottom: 1px solid #edf2f7;
   margin-bottom: 24px;
   gap: 16px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
 }
 
 .fv-nav-brand {
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .fv-nav-menu {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: clamp(12px, 1.8vw, 22px);
+  justify-content: center;
+  gap: clamp(14px, 2.2vw, 28px);
   white-space: nowrap;
-  flex-shrink: 0;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+@media (min-width: 993px) {
+  .fv-navbar,
+  .cat-navbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .fv-nav-brand,
+  .cat-nav-brand {
+    flex: 0 0 auto;
+  }
+
+  .fv-nav-menu,
+  .cat-nav-menu {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    z-index: 10;
+  }
+
+  .fv-search-pill,
+  .cat-search-pill {
+    margin-left: auto;
+  }
 }
 
 .fv-nav-item {
@@ -5189,11 +5430,16 @@ img {
   font-weight: 500;
   color: #64748b;
   text-decoration: none;
-  padding: 22px 2px;
+  padding: 22px 4px;
   position: relative;
   transition: color 0.15s ease;
   white-space: nowrap;
   flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  cursor: pointer;
+  -webkit-user-drag: none;
 }
 
 .fv-nav-item:hover {
@@ -5214,6 +5460,15 @@ img {
   height: 2.5px;
   background: #f04b55;
   border-radius: 9999px;
+}
+
+.fv-nav-right-cluster {
+  flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .fv-nav-actions {
@@ -5797,21 +6052,28 @@ img {
 .fv-comm-meta {
   position: relative;
   z-index: 2;
-  margin: 8px;
-  background: rgba(15, 23, 42, 0.78);
+  margin: 8px 6px;
+  background: rgba(15, 23, 42, 0.82);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
-  padding: 6px 10px;
+  padding: 6px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
   color: #ffffff;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .fv-comm-user {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .fv-comm-mini-avatar {
@@ -5823,15 +6085,22 @@ img {
 }
 
 .fv-comm-username {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .fv-comm-fit {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
   color: #38bdf8;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+  letter-spacing: -0.01em;
 }
 
 /* Boutiques Grid */
@@ -5962,6 +6231,7 @@ img {
 
   .fv-nav-brand {
     order: 1;
+    flex: 0 0 auto;
   }
 
   .fv-nav-actions {
@@ -5969,6 +6239,8 @@ img {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-left: auto;
+    flex: 0 0 auto;
   }
 
   .fv-search-pill {
@@ -5988,6 +6260,10 @@ img {
     scrollbar-width: none;
     padding: 6px 0 2px 0;
     margin: 0;
+    position: static;
+    transform: none;
+    display: flex;
+    justify-content: center;
   }
 
   .fv-nav-menu::-webkit-scrollbar {
@@ -6137,17 +6413,31 @@ img {
   border-bottom: 1px solid #edf2f7;
   margin-bottom: 24px;
   gap: 16px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
 }
 
 .cat-nav-brand {
+  flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   flex-shrink: 0;
 }
 
 .cat-nav-menu {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: clamp(12px, 1.8vw, 22px);
+  justify-content: center;
+  gap: clamp(14px, 2.2vw, 28px);
   white-space: nowrap;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
 }
 
 .cat-nav-item {
@@ -6155,11 +6445,16 @@ img {
   font-weight: 500;
   color: #64748b;
   text-decoration: none;
-  padding: 22px 2px;
+  padding: 22px 4px;
   position: relative;
   transition: color 0.15s ease;
   white-space: nowrap;
   flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  cursor: pointer;
+  -webkit-user-drag: none;
 }
 
 .cat-nav-item:hover {
@@ -6180,6 +6475,15 @@ img {
   height: 2.5px;
   background: #f04b55;
   border-radius: 9999px;
+}
+
+.cat-nav-right-cluster {
+  flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .cat-nav-actions {
@@ -6596,6 +6900,7 @@ img {
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   width: 100%;
+  justify-items: center;
 }
 
 .cat-card {
@@ -6607,6 +6912,9 @@ img {
   flex-direction: column;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
 }
 
 .cat-card:hover {
@@ -6618,9 +6926,20 @@ img {
 .cat-card-img-wrap {
   position: relative;
   width: 100%;
-  height: 155px;
+  height: 180px;
   overflow: hidden;
   background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cat-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
 }
 
 .cat-fav-btn {
@@ -7023,6 +7342,7 @@ img {
 
   .cat-nav-brand {
     order: 1;
+    flex: 0 0 auto;
   }
 
   .cat-nav-actions {
@@ -7030,6 +7350,8 @@ img {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-left: auto;
+    flex: 0 0 auto;
   }
 
   .cat-search-pill {
@@ -7049,6 +7371,10 @@ img {
     scrollbar-width: none;
     padding: 6px 16px 4px 2px;
     margin: 0;
+    position: static;
+    transform: none;
+    display: flex;
+    justify-content: center;
   }
 
   .cat-nav-menu::-webkit-scrollbar {
@@ -7059,7 +7385,23 @@ img {
 @media (max-width: 600px) {
   .cat-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    justify-items: center;
+  }
+
+  .cat-card {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  .cat-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
+    margin-bottom: 16px;
+    width: 100%;
   }
 
   .cat-nav-actions {
@@ -14296,13 +14638,54 @@ img {
     border-radius: 16px;
   }
 
-  .chk-form-row-2,
-  .chk-card-row-3 {
+  .chk-form-row-2 {
     grid-template-columns: 1fr;
   }
 
-  .chk-pay-left-group {
+  .chk-card-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
+  }
+
+  .chk-card-row-3 .chk-field-box:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .chk-pay-option-card {
+    padding: 14px 12px;
+  }
+
+  .chk-pay-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chk-pay-left-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .chk-pay-brand-logos {
+    flex-shrink: 0;
+  }
+
+  .chk-pay-info {
+    min-width: 0;
+  }
+
+  .chk-pay-badge {
+    margin-left: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 10.5px;
+    padding: 3px 8px;
   }
 
   .chk-left-column {
@@ -14336,21 +14719,22 @@ img {
   }
 
   .chk-pay-option-card {
-    padding: 10px 10px;
+    padding: 10px 8px;
   }
 
   .chk-pay-top-row {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
 
   .chk-pay-left-group {
-    gap: 8px;
+    gap: 6px;
   }
 
   .chk-pay-badge {
     align-self: flex-start;
-    margin-left: 28px;
+    margin-left: 24px;
+    font-size: 9.5px;
   }
 
   .chk-pay-btn {

@@ -17,7 +17,7 @@ const translations = {
     waistGirth: "Waist Girth",
     hipsGirth: "Hips Girth",
     inseamLength: "Inseam Length",
-    launchBtn: "Launch 3D Neural Mesh Generation",
+    launchBtn: "Continue to Body Scan",
   },
   FR: {
     title: "Ajustez vos mesures avec précision",
@@ -30,7 +30,7 @@ const translations = {
     waistGirth: "Tour de taille",
     hipsGirth: "Tour de hanches",
     inseamLength: "Longueur d'entrejambe",
-    launchBtn: "Lancer la génération du maillage 3D",
+    launchBtn: "Continuer vers le scan corporel",
   },
 };
 
@@ -75,7 +75,7 @@ export default function MeasurementsPage() {
   };
 
   const handleLaunch = () => {
-    router.push("/generating");
+    router.push("/body-capture");
   };
 
   return (

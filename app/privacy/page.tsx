@@ -21,7 +21,7 @@ const translations = {
     consent1: "I consent to the calculation of my morphological measurements for virtual try-on.",
     consent2: "I agree to receive personalized fit and size drop alerts for my favorite brands (optional).",
     consentAlert: "Please consent to the calculation of your morphological measurements to proceed.",
-    submitBtn: "Confirm & Proceed to Body Scan",
+    submitBtn: "Confirm & Proceed to Measurements",
     gdpr: "GDPR Compliant",
     gdprSub: "Your data, our priority.",
     encrypted: "Encrypted Photos",
@@ -43,7 +43,7 @@ const translations = {
     consent1: "Je consens au calcul de mes mesures morphologiques pour l'essayage virtuel.",
     consent2: "J'accepte de recevoir des alertes de taille et d'ajustement pour mes marques préférées (facultatif).",
     consentAlert: "Veuillez accepter le calcul de vos mesures morphologiques pour continuer.",
-    submitBtn: "Confirmer et passer au scan corporel",
+    submitBtn: "Confirmer et passer aux mesures",
     gdpr: "Conforme RGPD",
     gdprSub: "Vos données, notre priorité.",
     encrypted: "Photos chiffrées",
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
       alert(t.consentAlert);
       return;
     }
-    router.push("/body-capture");
+    router.push("/measurements");
   };
 
   return (
