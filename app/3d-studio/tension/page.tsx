@@ -1,11 +1,149 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 
+const translations = {
+  EN: {
+    navHome: "Home",
+    navCatalog: "Catalog",
+    navStudio: "3D Studio",
+    navWardrobe: "Wardrobe",
+    searchPlaceholder: "Search brands, styles, or items...",
+    cartTitle: "Cart",
+    profileTitle: "User Profile",
+    bannerTitle: "Real-Time Fabric Tension Map",
+    bannerSub: "— Based on 2% elastane weave stretch index",
+    bannerLive: "Live analysis • Personalized for your 3D avatar",
+    legendTitle: "Tension Heatmap Legend",
+    optFit: "Optimal Fit",
+    optFitSub: "100% movement comfort",
+    normEase: "Normal Ease",
+    normEaseSub: "Slightly relaxed fit",
+    tenZone: "Tension Zone",
+    tenZoneSub: "Fabric stretched (+%)",
+    controlsTitle: "View Controls",
+    rotate: "Rotate",
+    zoom: "Zoom",
+    reset: "Reset",
+    outfitTitle: "Current Outfit",
+    blazerName: "Balmain Blazer",
+    blazerColor: "Navy Blue",
+    shirtName: "White Silk Shirt",
+    shirtLayer: "(Layer 1)",
+    trousersName: "Slim Trousers",
+    trousersLayer: "(Layer 2)",
+    aiBadgeTitle: "AI Fabric Analysis",
+    aiBadgeSub: "Powered by 3D body mesh & fabric physics",
+    dragHint: "Drag to rotate",
+    analysisTitle: "Fit Analysis",
+    shoulders: "Shoulders",
+    shouldersDesc: "43cm garment vs 42cm body",
+    shouldersBadge: "Perfect Match",
+    waist: "Waist",
+    waistDesc: "3.5cm ease allowance",
+    waistBadge: "Ideal for seated posture",
+    noteTitle: "Note",
+    noteBody: "When lower button is closed, slight tension appears over hips.",
+    recTitle: "FitVisor Recommendation",
+    recActive: "Size L applied! Enjoy relaxed, comfortable movement across the waist and hips.",
+    recDefault: "Try Size L for a more relaxed, modern oversized drape.",
+    recBtnActive: "Size L Selected ✓",
+    recBtnDefault: "Switch to Size L Instantly →",
+    quickActions: "Quick Actions",
+    viewDetails: "View Heatmap\nDetails",
+    compareSizes: "Compare\nSizes",
+    saveAnalysis: "Save\nAnalysis",
+    saved: "Saved ✓",
+    saveToast: "Analysis saved to your Wardrobe!",
+    removeToast: "Analysis removed from your Wardrobe",
+    viewWardrobe: "View Wardrobe →",
+    chestPin: "Chest",
+    cuffsPin: "Cuffs & Sleeves",
+    hipPin: "Lower Hip Closure",
+  },
+  FR: {
+    navHome: "Accueil",
+    navCatalog: "Catalogue",
+    navStudio: "Studio 3D",
+    navWardrobe: "Garde-robe",
+    searchPlaceholder: "Rechercher des marques, styles...",
+    cartTitle: "Panier",
+    profileTitle: "Profil utilisateur",
+    bannerTitle: "Carte thermique des tensions du tissu",
+    bannerSub: "— Basé sur l'indice d'élasticité de 2% d'élasthanne",
+    bannerLive: "Analyse en direct • Personnalisée pour votre avatar 3D",
+    legendTitle: "Légende de la carte de tension",
+    optFit: "Ajustement optimal",
+    optFitSub: "Confort de mouvement 100%",
+    normEase: "Aisance normale",
+    normEaseSub: "Coupe légèrement décontractée",
+    tenZone: "Zone de tension",
+    tenZoneSub: "Tissu étiré (+%)",
+    controlsTitle: "Contrôles de vue",
+    rotate: "Pivoter",
+    zoom: "Zoomer",
+    reset: "Réinitialiser",
+    outfitTitle: "Tenue actuelle",
+    blazerName: "Blazer Balmain",
+    blazerColor: "Bleu marine",
+    shirtName: "Chemise en soie blanche",
+    shirtLayer: "(Couche 1)",
+    trousersName: "Pantalon ajusté",
+    trousersLayer: "(Couche 2)",
+    aiBadgeTitle: "Analyse IA du tissu",
+    aiBadgeSub: "Propulsée par le maillage 3D & la physique des étoffes",
+    dragHint: "Glisser pour pivoter",
+    analysisTitle: "Analyse de la coupe",
+    shoulders: "Épaules",
+    shouldersDesc: "43 cm vêtement vs 42 cm corps",
+    shouldersBadge: "Parfaitement ajusté",
+    waist: "Taille",
+    waistDesc: "3,5 cm d'aisance",
+    waistBadge: "Idéal en position assise",
+    noteTitle: "Remarque",
+    noteBody: "Lorsque le bouton inférieur est fermé, une légère tension apparaît sur les hanches.",
+    recTitle: "Recommandation FitVisor",
+    recActive: "Taille L appliquée ! Profitez d'une liberté de mouvement agréable aux hanches.",
+    recDefault: "Essayez la taille L pour un tombé plus décontracté et moderne.",
+    recBtnActive: "Taille L sélectionnée ✓",
+    recBtnDefault: "Passer à la taille L instantanément →",
+    quickActions: "Actions rapides",
+    viewDetails: "Détails de la\ntension",
+    compareSizes: "Comparer les\ntailles",
+    saveAnalysis: "Enregistrer\nl'analyse",
+    saved: "Enregistré ✓",
+    saveToast: "Analyse enregistrée dans votre garde-robe !",
+    removeToast: "Analyse retirée de votre garde-robe",
+    viewWardrobe: "Voir la garde-robe →",
+    chestPin: "Poitrine",
+    cuffsPin: "Poignets & Manches",
+    hipPin: "Fermeture hanches",
+  },
+};
+
 export default function FabricTensionPage() {
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  // Load language preference from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const t = translations[lang];
+
   const [rotationAngle, setRotationAngle] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
@@ -13,7 +151,7 @@ export default function FabricTensionPage() {
   const [selectedSize, setSelectedSize] = useState<"M" | "L">("M");
   const [cartCount, setCartCount] = useState(3);
   const [isSaved, setIsSaved] = useState(false);
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [toastMsg, setToastMsg] = useState<{ text: string; link: string; linkText: string } | null>(null);
 
   // Drag-to-rotate interaction handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -47,11 +185,43 @@ export default function FabricTensionPage() {
   };
 
   const handleSwitchSize = () => {
-    setSelectedSize("L");
+    const nextSize = selectedSize === "M" ? "L" : "M";
+    setSelectedSize(nextSize);
   };
 
   const handleSaveAnalysis = () => {
-    setIsSaved(!isSaved);
+    const nextSaved = !isSaved;
+    setIsSaved(nextSaved);
+
+    // Sync to localStorage
+    try {
+      const storedItems = localStorage.getItem("fitvisor_saved_wardrobe_items");
+      let items: any[] = storedItems ? JSON.parse(storedItems) : [];
+      if (nextSaved) {
+        if (!items.some((item) => item.id === "tension-analysis")) {
+          items.push({
+            id: "tension-analysis",
+            name: lang === "FR" ? "Analyse de tension - Blazer Balmain" : "Tension Analysis - Balmain Blazer",
+            brand: "BALMAIN",
+            price: "$1,290.00",
+            category: "Analysis",
+            thumb: "/images/tension/thumb_blazer.png",
+          });
+        }
+      } else {
+        items = items.filter((item) => item.id !== "tension-analysis");
+      }
+      localStorage.setItem("fitvisor_saved_wardrobe_items", JSON.stringify(items));
+    } catch (err) {
+      console.error(err);
+    }
+
+    setToastMsg({
+      text: nextSaved ? t.saveToast : t.removeToast,
+      link: "/wardrobe",
+      linkText: t.viewWardrobe,
+    });
+    setTimeout(() => setToastMsg(null), 3200);
   };
 
   return (
@@ -60,68 +230,84 @@ export default function FabricTensionPage() {
       onMouseUp={handleMouseUp}
     >
       <div className="ten-container">
-        {/* ================= HEADER / NAVBAR ================= */}
-        <header className="stu-navbar">
-          <div className="stu-nav-brand">
+        {/* ================= HEADER / NAVBAR (Standard cat-navbar) ================= */}
+        <header className="cat-navbar" style={{ marginBottom: "26px" }}>
+          {/* Brand Logo - Row 1 Left */}
+          <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
-          <nav className="stu-nav-menu">
-            <Link href="/" className="stu-nav-item">
-              Home
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
+          <nav className="cat-nav-menu">
+            <Link href="/" className="cat-nav-item">
+              {t.navHome}
             </Link>
-            <Link href="/catalog" className="stu-nav-item">
-              Catalog
+            <Link href="/catalog" className="cat-nav-item">
+              {t.navCatalog}
             </Link>
-            <Link href="/3d-studio" className="stu-nav-item active">
-              3D Studio
+            <Link href="/3d-studio" className="cat-nav-item active">
+              {t.navStudio}
             </Link>
-            <Link href="#wardrobe" className="stu-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="#community" className="stu-nav-item">
-              Community
+            <Link href="/wardrobe" className="cat-nav-item">
+              {t.navWardrobe}
             </Link>
           </nav>
 
-          <div className="stu-nav-actions">
-            <div className="stu-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items.."
-                className="stu-search-input"
-              />
+          {/* Search Pill - Center Right (Desktop) / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
+          <div className="cat-nav-actions">
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="ten-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="ten-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <button
-              type="button"
-              className="stu-cart-btn"
-              title="Cart"
-              onClick={() => setCartCount((prev) => prev + 1)}
-            >
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span className="stu-cart-badge">{cartCount}</span>
-            </button>
+              <span className="cat-cart-badge">{cartCount}</span>
+            </Link>
 
-            <Link href="/digital-twin" className="stu-user-avatar-wrap" title="User Profile">
+            {/* User Profile Avatar */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
                 width={32}
                 height={32}
-                className="stu-user-avatar-img"
+                className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
             </Link>
           </div>
         </header>
@@ -138,7 +324,7 @@ export default function FabricTensionPage() {
               </svg>
             </div>
             <h1 className="ten-banner-title">
-              Real-Time Fabric Tension Map <span>— Based on 2% elastane weave stretch index</span>
+              {t.bannerTitle} <span>{t.bannerSub}</span>
             </h1>
           </div>
 
@@ -148,7 +334,7 @@ export default function FabricTensionPage() {
               <line x1="12" x2="12" y1="16" y2="12" />
               <line x1="12" x2="12.01" y1="8" y2="8" />
             </svg>
-            <span>Live analysis &bull; Personalized for your 3D avatar</span>
+            <span>{t.bannerLive}</span>
           </div>
         </div>
 
@@ -158,29 +344,29 @@ export default function FabricTensionPage() {
           <aside className="ten-left-card">
             {/* Tension Heatmap Legend */}
             <div>
-              <h2 className="ten-section-title">Tension Heatmap Legend</h2>
+              <h2 className="ten-section-title">{t.legendTitle}</h2>
               <div className="ten-legend-list">
                 <div className="ten-legend-item">
                   <span className="ten-legend-dot optimal" />
                   <div className="ten-legend-text">
-                    <span className="ten-legend-label">Optimal Fit</span>
-                    <span className="ten-legend-sub">100% movement comfort</span>
+                    <span className="ten-legend-label">{t.optFit}</span>
+                    <span className="ten-legend-sub">{t.optFitSub}</span>
                   </div>
                 </div>
 
                 <div className="ten-legend-item">
                   <span className="ten-legend-dot normal" />
                   <div className="ten-legend-text">
-                    <span className="ten-legend-label">Normal Ease</span>
-                    <span className="ten-legend-sub">Slightly relaxed fit</span>
+                    <span className="ten-legend-label">{t.normEase}</span>
+                    <span className="ten-legend-sub">{t.normEaseSub}</span>
                   </div>
                 </div>
 
                 <div className="ten-legend-item">
                   <span className="ten-legend-dot tension" />
                   <div className="ten-legend-text">
-                    <span className="ten-legend-label">Tension Zone</span>
-                    <span className="ten-legend-sub">Fabric stretched (+%)</span>
+                    <span className="ten-legend-label">{t.tenZone}</span>
+                    <span className="ten-legend-sub">{t.tenZoneSub}</span>
                   </div>
                 </div>
               </div>
@@ -188,7 +374,7 @@ export default function FabricTensionPage() {
 
             {/* View Controls */}
             <div>
-              <h3 className="ten-section-title">View Controls</h3>
+              <h3 className="ten-section-title">{t.controlsTitle}</h3>
               <div className="ten-controls-row">
                 <button
                   type="button"
@@ -199,7 +385,7 @@ export default function FabricTensionPage() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                   </svg>
-                  <span>Rotate</span>
+                  <span>{t.rotate}</span>
                 </button>
 
                 <button
@@ -212,7 +398,7 @@ export default function FabricTensionPage() {
                     <circle cx="11" cy="11" r="8" />
                     <line x1="8" y1="11" x2="14" y2="11" />
                   </svg>
-                  <span>Zoom</span>
+                  <span>{t.zoom}</span>
                 </button>
 
                 <button
@@ -225,14 +411,14 @@ export default function FabricTensionPage() {
                     <polyline points="1 4 1 10 7 10" />
                     <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                   </svg>
-                  <span>Reset</span>
+                  <span>{t.reset}</span>
                 </button>
               </div>
             </div>
 
             {/* Current Outfit */}
             <div>
-              <h3 className="ten-section-title">Current Outfit</h3>
+              <h3 className="ten-section-title">{t.outfitTitle}</h3>
               <div className="ten-outfit-list">
                 <div className="ten-outfit-row">
                   <div className="ten-outfit-thumb-wrap">
@@ -245,8 +431,8 @@ export default function FabricTensionPage() {
                     />
                   </div>
                   <div className="ten-outfit-info">
-                    <span className="ten-outfit-name">Balmain Blazer</span>
-                    <span className="ten-outfit-meta">Navy Blue</span>
+                    <span className="ten-outfit-name">{t.blazerName}</span>
+                    <span className="ten-outfit-meta">{t.blazerColor}</span>
                   </div>
                 </div>
 
@@ -261,8 +447,8 @@ export default function FabricTensionPage() {
                     />
                   </div>
                   <div className="ten-outfit-info">
-                    <span className="ten-outfit-name">White Silk Shirt</span>
-                    <span className="ten-outfit-meta">(Layer 1)</span>
+                    <span className="ten-outfit-name">{t.shirtName}</span>
+                    <span className="ten-outfit-meta">{t.shirtLayer}</span>
                   </div>
                 </div>
 
@@ -277,8 +463,8 @@ export default function FabricTensionPage() {
                     />
                   </div>
                   <div className="ten-outfit-info">
-                    <span className="ten-outfit-name">Slim Trousers</span>
-                    <span className="ten-outfit-meta">(Layer 2)</span>
+                    <span className="ten-outfit-name">{t.trousersName}</span>
+                    <span className="ten-outfit-meta">{t.trousersLayer}</span>
                   </div>
                 </div>
               </div>
@@ -296,8 +482,8 @@ export default function FabricTensionPage() {
                 </svg>
               </div>
               <div className="ten-ai-text">
-                <span className="ten-ai-title">AI Fabric Analysis</span>
-                <span className="ten-ai-sub">Powered by 3D body mesh &amp; fabric physics</span>
+                <span className="ten-ai-title">{t.aiBadgeTitle}</span>
+                <span className="ten-ai-sub">{t.aiBadgeSub}</span>
               </div>
             </div>
           </aside>
@@ -316,13 +502,46 @@ export default function FabricTensionPage() {
               }}
             >
               <Image
-                src="/images/tension/tension_stage_complete.png"
+                src="/images/tension/avatar_tension_heatmap.png"
                 alt="Real-Time Fabric Tension Map Model"
-                width={460}
-                height={541}
+                width={380}
+                height={540}
                 priority
                 className="ten-stage-img"
               />
+
+              {/* Dynamic Interactive Heatmap Pins */}
+              <div className="ten-pin pin-shoulder" title={`${t.shoulders}: ${t.optFit}`}>
+                <div className="ten-pin-pulse optimal" />
+                <div className="ten-pin-card">
+                  <span className="ten-pin-title">{t.shoulders}</span>
+                  <span className="ten-pin-sub">{t.optFit} • 100%</span>
+                </div>
+              </div>
+
+              <div className="ten-pin pin-chest" title={`${t.chestPin}: ${t.optFit}`}>
+                <div className="ten-pin-pulse optimal" />
+                <div className="ten-pin-card">
+                  <span className="ten-pin-title">{t.chestPin}</span>
+                  <span className="ten-pin-sub">{t.optFit} • 100%</span>
+                </div>
+              </div>
+
+              <div className="ten-pin pin-cuffs" title={`${t.cuffsPin}: ${t.normEase}`}>
+                <div className="ten-pin-pulse normal" />
+                <div className="ten-pin-card">
+                  <span className="ten-pin-title">{t.cuffsPin}</span>
+                  <span className="ten-pin-sub">{t.normEase}</span>
+                </div>
+              </div>
+
+              <div className="ten-pin pin-hip" title={`${t.hipPin}: ${t.tenZone}`}>
+                <div className="ten-pin-pulse tension" />
+                <div className="ten-pin-card">
+                  <span className="ten-pin-title">{t.hipPin}</span>
+                  <span className="ten-pin-sub">{t.tenZone} (+4%)</span>
+                </div>
+              </div>
             </div>
 
             {/* Drag to rotate 360 label */}
@@ -336,7 +555,7 @@ export default function FabricTensionPage() {
                 <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
                 <path d="M16 21h5v-5" />
               </svg>
-              <span style={{ marginLeft: "4px" }}>Drag to rotate</span>
+              <span style={{ marginLeft: "4px" }}>{t.dragHint}</span>
             </div>
           </div>
 
@@ -350,7 +569,7 @@ export default function FabricTensionPage() {
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               </div>
-              <h2 className="ten-panel-title">Fit Analysis</h2>
+              <h2 className="ten-panel-title">{t.analysisTitle}</h2>
             </div>
 
             {/* Metric Items */}
@@ -364,15 +583,15 @@ export default function FabricTensionPage() {
                     </svg>
                   </div>
                   <div className="ten-metric-info">
-                    <span className="ten-metric-name">Shoulders</span>
-                    <span className="ten-metric-desc">43cm garment vs 42cm body</span>
+                    <span className="ten-metric-name">{t.shoulders}</span>
+                    <span className="ten-metric-desc">{t.shouldersDesc}</span>
                   </div>
                 </div>
                 <div className="ten-metric-badge">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  <span>Perfect Match</span>
+                  <span>{t.shouldersBadge}</span>
                 </div>
               </div>
 
@@ -385,15 +604,15 @@ export default function FabricTensionPage() {
                     </svg>
                   </div>
                   <div className="ten-metric-info">
-                    <span className="ten-metric-name">Waist</span>
-                    <span className="ten-metric-desc">3.5cm ease allowance</span>
+                    <span className="ten-metric-name">{t.waist}</span>
+                    <span className="ten-metric-desc">{t.waistDesc}</span>
                   </div>
                 </div>
                 <div className="ten-metric-badge">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  <span>Ideal for seated posture</span>
+                  <span>{t.waistBadge}</span>
                 </div>
               </div>
             </div>
@@ -406,10 +625,8 @@ export default function FabricTensionPage() {
                 <line x1="12" x2="12.01" y1="8" y2="8" />
               </svg>
               <div className="ten-note-content">
-                <span className="ten-note-title">Note</span>
-                <span className="ten-note-body">
-                  When lower button is closed, slight tension appears over hips.
-                </span>
+                <span className="ten-note-title">{t.noteTitle}</span>
+                <span className="ten-note-body">{t.noteBody}</span>
               </div>
             </div>
 
@@ -421,13 +638,11 @@ export default function FabricTensionPage() {
                   <path d="M9 18h6" />
                   <path d="M10 22h4" />
                 </svg>
-                <span className="ten-rec-title">Fitvisor Recommendation</span>
+                <span className="ten-rec-title">{t.recTitle}</span>
               </div>
 
               <p className="ten-rec-text">
-                {selectedSize === "L"
-                  ? "Size L applied! Enjoy relaxed, comfortable movement across the waist and hips."
-                  : "Try Size L for a more relaxed, modern oversized drape."}
+                {selectedSize === "L" ? t.recActive : t.recDefault}
               </p>
 
               <button
@@ -439,13 +654,13 @@ export default function FabricTensionPage() {
                   <circle cx="12" cy="5" r="2" />
                   <path d="m14 7 8 8-2 2-6-6-6 6-2-2 8-8" />
                 </svg>
-                <span>{selectedSize === "L" ? "Size L Selected ✓" : "Switch to Size L Instantly →"}</span>
+                <span>{selectedSize === "L" ? t.recBtnActive : t.recBtnDefault}</span>
               </button>
             </div>
 
             {/* Quick Actions */}
             <div>
-              <h3 className="ten-actions-title">Quick Actions</h3>
+              <h3 className="ten-actions-title">{t.quickActions}</h3>
               <div className="ten-actions-row">
                 <Link href="/3d-studio" className="ten-action-card">
                   <div className="ten-action-icon">
@@ -455,7 +670,9 @@ export default function FabricTensionPage() {
                       <polyline points="2 12 12 17 22 12" />
                     </svg>
                   </div>
-                  <span className="ten-action-label">View Heatmap<br />Details</span>
+                  <span className="ten-action-label" style={{ whiteSpace: "pre-line" }}>
+                    {t.viewDetails}
+                  </span>
                 </Link>
 
                 <Link href="/3d-studio/compare" className="ten-action-card">
@@ -465,7 +682,9 @@ export default function FabricTensionPage() {
                       <line x1="12" x2="12" y1="8" y2="16" />
                     </svg>
                   </div>
-                  <span className="ten-action-label">Compare<br />Sizes</span>
+                  <span className="ten-action-label" style={{ whiteSpace: "pre-line" }}>
+                    {t.compareSizes}
+                  </span>
                 </Link>
 
                 <button
@@ -478,12 +697,27 @@ export default function FabricTensionPage() {
                       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                     </svg>
                   </div>
-                  <span className="ten-action-label">{isSaved ? "Saved ✓" : "Save\nAnalysis"}</span>
+                  <span className="ten-action-label" style={{ whiteSpace: "pre-line" }}>
+                    {isSaved ? t.saved : t.saveAnalysis}
+                  </span>
                 </button>
               </div>
             </div>
           </aside>
         </div>
+
+        {/* Dynamic Toast Feedback Notification */}
+        {toastMsg && (
+          <div className="cat-toast-banner">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" strokeWidth="2">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <span>{toastMsg.text}</span>
+            <Link href={toastMsg.link} className="cat-toast-link">
+              {toastMsg.linkText}
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

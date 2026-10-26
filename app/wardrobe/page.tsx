@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
@@ -87,11 +87,137 @@ const INITIAL_CAPSULES: OutfitCapsule[] = [
   },
 ];
 
+const SAVED_GARMENTS = [
+  { id: "sg1", name: "Silk Shirt", brand: "BALMAIN", price: "$320.00", category: "Tops", thumb: "/images/wardrobe/thumb_shirt.png" },
+  { id: "sg2", name: "Navy Blazer", brand: "BALMAIN", price: "$980.00", category: "Outerwear", thumb: "/images/wardrobe/thumb_blazer.png" },
+  { id: "sg3", name: "Tailored Trousers", brand: "BALMAIN", price: "$540.00", category: "Bottoms", thumb: "/images/wardrobe/thumb_trousers.png" },
+  { id: "sg4", name: "Cashmere Sweater", brand: "BRUNELLO CUCINELLI", price: "$360.00", category: "Knitwear", thumb: "/images/wardrobe/thumb_sweater.png" },
+  { id: "sg5", name: "Straight Denim", brand: "ACNE STUDIOS", price: "$280.00", category: "Bottoms", thumb: "/images/wardrobe/thumb_denim.png" },
+  { id: "sg6", name: "White Sneakers", brand: "COMMON PROJECTS", price: "$180.00", category: "Footwear", thumb: "/images/wardrobe/thumb_sneakers.png" },
+];
+
+const TRY_ON_HISTORY = [
+  { id: "h1", name: "Power Business Look", formula: "Navy Blazer + Silk Shirt + Trousers", date: "Today, 14:20", fit: "96% Optimal Fit", thumb: "/images/wardrobe/thumb_blazer.png" },
+  { id: "h2", name: "Casual Weekend", formula: "Cashmere Sweater + Denim + Sneakers", date: "Yesterday, 18:45", fit: "94% Optimal Fit", thumb: "/images/wardrobe/thumb_sweater.png" },
+  { id: "h3", name: "Silk Crepe Minimal Look", formula: "Silk Shirt + Tailored Trousers", date: "Oct 22, 11:10", fit: "98% Optimal Fit", thumb: "/images/wardrobe/thumb_shirt.png" },
+];
+
+const translations = {
+  EN: {
+    navHome: "Home",
+    navCatalog: "Catalog",
+    navStudio: "3D Studio",
+    navWardrobe: "Wardrobe",
+    navPricing: "Plans",
+    searchPlaceholder: "Search brands, styles, or items...",
+    cartTitle: "Cart",
+    profileTitle: "User Profile",
+    heroTitle: "Mon Dressing",
+    heroSubtitle: "Your virtual wardrobe. Organized, styled, always with you.",
+    tabOutfits: "My Complete Outfits",
+    tabSaved: "Saved Garments",
+    tabHistory: "Try-On History",
+    syncLabel: "Wardrobe synced with Zalando and H&M",
+    utilTitle: "Clothing utilization rate",
+    utilSub: "You're getting great use out of your wardrobe!",
+    totalPrice: "Total Price",
+    items: "Items",
+    openStudio: "Open in 3D Studio",
+    undo: "Undo",
+    tryInStudio: "Try in 3D Studio",
+    addToCart: "Add to Cart",
+    fitScore: "Fit Score",
+    reopenSession: "Re-Open 3D Studio",
+  },
+  FR: {
+    navHome: "Accueil",
+    navCatalog: "Catalogue",
+    navStudio: "Studio 3D",
+    navWardrobe: "Garde-robe",
+    navPricing: "Tarifs",
+    searchPlaceholder: "Rechercher des marques, styles...",
+    cartTitle: "Panier",
+    profileTitle: "Profil utilisateur",
+    heroTitle: "Mon Dressing",
+    heroSubtitle: "Votre garde-robe virtuelle. Organisée, stylée, toujours avec vous.",
+    tabOutfits: "Mes tenues complètes",
+    tabSaved: "Vêtements enregistrés",
+    tabHistory: "Historique d'essayage",
+    syncLabel: "Garde-robe synchronisée avec Zalando et H&M",
+    utilTitle: "Taux d'utilisation de la garde-robe",
+    utilSub: "Vous tirez le meilleur parti de vos tenues !",
+    totalPrice: "Prix total",
+    items: "Articles",
+    openStudio: "Ouvrir en Studio 3D",
+    undo: "Annuler",
+    tryInStudio: "Essayer dans le Studio 3D",
+    addToCart: "Ajouter au panier",
+    fitScore: "Indice d'ajustement",
+    reopenSession: "Rouvrir en Studio 3D",
+  },
+};
+
 export default function WardrobePage() {
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  // Load language preference from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const t = translations[lang];
+
   const [activeTab, setActiveTab] = useState<"outfits" | "saved" | "history">("outfits");
   const [capsules, setCapsules] = useState<OutfitCapsule[]>(INITIAL_CAPSULES);
+  const [savedGarments, setSavedGarments] = useState(SAVED_GARMENTS);
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [deletedToast, setDeletedToast] = useState<string | null>(null);
+
+  // Load custom saved wardrobe items from catalog / product page
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("fitvisor_saved_wardrobe_items");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const defaultIds = new Set(SAVED_GARMENTS.map((g) => g.id));
+          const additions = parsed.filter((item: any) => !defaultIds.has(item.id));
+          setSavedGarments([...SAVED_GARMENTS, ...additions]);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleDeleteSavedGarment = (id: string, name: string) => {
+    const updated = savedGarments.filter((g) => g.id !== id);
+    setSavedGarments(updated);
+    try {
+      const stored = localStorage.getItem("fitvisor_saved_wardrobe_items");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const filtered = parsed.filter((item: any) => item.id !== id);
+        localStorage.setItem("fitvisor_saved_wardrobe_items", JSON.stringify(filtered));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setDeletedToast(lang === "FR" ? `"${name}" retiré de votre garde-robe` : `Removed "${name}" from your wardrobe`);
+    setTimeout(() => {
+      setDeletedToast(null);
+    }, 3500);
+  };
 
   const handleDeleteCapsule = (id: string, title: string) => {
     setCapsules((prev) => prev.filter((c) => c.id !== id));
@@ -103,6 +229,7 @@ export default function WardrobePage() {
 
   const handleRestore = () => {
     setCapsules(INITIAL_CAPSULES);
+    setSavedGarments(SAVED_GARMENTS);
     setDeletedToast(null);
   };
 
@@ -119,46 +246,69 @@ export default function WardrobePage() {
   return (
     <div className="ward-page-wrapper">
       <div className="ward-container">
-        {/* ================= HEADER / NAVBAR ================= */}
-        <header className="cat-navbar" style={{ marginBottom: "26px" }}>
+        {/* ================= HEADER / NAVBAR (Consistent Structure) ================= */}
+        <header className="cat-navbar">
+          {/* Brand Logo - Row 1 Left */}
           <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
           <nav className="cat-nav-menu">
             <Link href="/" className="cat-nav-item">
-              Home
+              {t.navHome}
             </Link>
             <Link href="/catalog" className="cat-nav-item">
-              Catalog
+              {t.navCatalog}
             </Link>
             <Link href="/3d-studio" className="cat-nav-item">
-              3D Studio
+              {t.navStudio}
             </Link>
             <Link href="/wardrobe" className="cat-nav-item active">
-              Wardrobe
-            </Link>
-            <Link href="/community" className="cat-nav-item">
-              Community
+              {t.navWardrobe}
             </Link>
           </nav>
 
+          {/* Search Bar - Desktop Right / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
           <div className="cat-nav-actions">
-            <div className="cat-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                className="cat-search-input"
-              />
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="ward-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="ward-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <Link href="/cart" className="cat-cart-btn" title="Cart" style={{ textDecoration: "none" }}>
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
@@ -167,7 +317,8 @@ export default function WardrobePage() {
               <span className="cat-cart-badge">3</span>
             </Link>
 
-            <div className="cat-user-avatar-wrap" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            {/* User Profile Avatar */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
@@ -175,10 +326,7 @@ export default function WardrobePage() {
                 height={32}
                 className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
+            </Link>
           </div>
         </header>
 
@@ -191,9 +339,9 @@ export default function WardrobePage() {
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0f224a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="ward-hanger-icon">
                   <path d="M12 4a3 3 0 0 1 3 3c0 1.3-.84 2.4-2 2.82V12l7 6H4l7-6V9.82C9.84 9.4 9 8.3 9 7a3 3 0 0 1 3-3z" />
                 </svg>
-                <h1 className="ward-main-title">Mon Dressing</h1>
+                <h1 className="ward-main-title">{t.heroTitle}</h1>
               </div>
-              <p className="ward-subtitle">Your virtual wardrobe. Organized, styled, always with you.</p>
+              <p className="ward-subtitle">{t.heroSubtitle}</p>
             </div>
 
             {/* Tab Switcher Pills */}
@@ -206,7 +354,7 @@ export default function WardrobePage() {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 4a3 3 0 0 1 3 3c0 1.3-.84 2.4-2 2.82V12l7 6H4l7-6V9.82C9.84 9.4 9 8.3 9 7a3 3 0 0 1 3-3z" />
                 </svg>
-                <span>My Complete Outfits ({capsules.length})</span>
+                <span>{t.tabOutfits} ({capsules.length})</span>
               </button>
 
               <button
@@ -217,7 +365,7 @@ export default function WardrobePage() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                 </svg>
-                <span>Saved Garments (12)</span>
+                <span>{t.tabSaved} ({savedGarments.length})</span>
               </button>
 
               <button
@@ -229,7 +377,7 @@ export default function WardrobePage() {
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span>Try-On History (28)</span>
+                <span>{t.tabHistory} ({TRY_ON_HISTORY.length})</span>
               </button>
             </div>
           </div>
@@ -254,7 +402,7 @@ export default function WardrobePage() {
                 <span className="ward-hm-badge">H&amp;M</span>
               </div>
 
-              <span className="ward-sync-label">Wardrobe synced with Zalando and H&amp;M</span>
+              <span className="ward-sync-label">{t.syncLabel}</span>
 
               <div className="ward-sync-status-icon">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="#10b981">
@@ -283,8 +431,8 @@ export default function WardrobePage() {
               </div>
 
               <div className="ward-utilization-info">
-                <span className="ward-util-title">Clothing utilization rate</span>
-                <span className="ward-util-sub">You&apos;re getting great use out of your wardrobe!</span>
+                <span className="ward-util-title">{t.utilTitle}</span>
+                <span className="ward-util-sub">{t.utilSub}</span>
               </div>
 
               <div className="ward-chart-icon">
@@ -326,7 +474,7 @@ export default function WardrobePage() {
                 padding: "2px 6px",
               }}
             >
-              Undo
+              {t.undo}
             </button>
           </div>
         )}
@@ -357,10 +505,15 @@ export default function WardrobePage() {
                     </div>
                   </div>
 
-                  <button type="button" className="ward-options-btn" title="More options">
+                  <button
+                    type="button"
+                    className="ward-options-btn"
+                    title="Delete outfit"
+                    onClick={() => handleDeleteCapsule(capsule.id, capsule.title)}
+                  >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                       <circle cx="12" cy="12" r="2" />
-                      <circle cx="19" cy="12" r="2" />
+                      <circle cx="19" cy="21" r="2" />
                       <circle cx="5" cy="12" r="2" />
                     </svg>
                   </button>
@@ -384,19 +537,19 @@ export default function WardrobePage() {
                   <div className="ward-garments-list">
                     {capsule.garments.map((g) => (
                       <div key={g.id} className="ward-garment-item">
-                        <div className="ward-garment-thumb-wrap">
-                          <Image
-                            src={g.thumb}
-                            alt={g.name}
-                            width={38}
-                            height={44}
-                            className="ward-garment-thumb"
-                          />
-                        </div>
-                        <div className="ward-garment-meta">
+                        <div className="ward-garment-left">
+                          <div className="ward-garment-thumb-wrap">
+                            <Image
+                              src={g.thumb}
+                              alt={g.name}
+                              width={38}
+                              height={44}
+                              className="ward-garment-thumb"
+                            />
+                          </div>
                           <span className="ward-garment-name">{g.name}</span>
-                          <span className="ward-garment-price">{g.price}</span>
                         </div>
+                        <span className="ward-garment-price">{g.price}</span>
                       </div>
                     ))}
                   </div>
@@ -406,10 +559,10 @@ export default function WardrobePage() {
                 <div className="ward-card-footer">
                   <div className="ward-price-action-row">
                     <div className="ward-price-group">
-                      <span className="ward-price-label">Total Price</span>
+                      <span className="ward-price-label">{t.totalPrice}</span>
                       <div className="ward-price-val-row">
                         <span className="ward-price-val">{capsule.totalPrice}</span>
-                        <span className="ward-items-count-pill">{capsule.itemsCount} Items</span>
+                        <span className="ward-items-count-pill">{capsule.itemsCount} {t.items}</span>
                       </div>
                     </div>
 
@@ -419,52 +572,7 @@ export default function WardrobePage() {
                         <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                         <line x1="12" y1="22.08" x2="12" y2="12"></line>
                       </svg>
-                      <span>Open in 3D Studio</span>
-                    </Link>
-                  </div>
-
-                  {/* Secondary Actions */}
-                  <div className="ward-secondary-actions-row">
-                    <div style={{ display: "flex", gap: "6px" }}>
-                      <Link href="/3d-studio/layering" className="ward-action-pill-btn">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                        </svg>
-                        <span>Edit</span>
-                      </Link>
-
-                      <Link href="/3d-studio/ask-friend" className="ward-action-pill-btn">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="18" cy="5" r="3"></circle>
-                          <circle cx="6" cy="12" r="3"></circle>
-                          <circle cx="18" cy="19" r="3"></circle>
-                          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                        </svg>
-                        <span>Share with Friend</span>
-                      </Link>
-
-                      <button
-                        type="button"
-                        className="ward-action-pill-btn"
-                        onClick={() => handleDeleteCapsule(capsule.id, capsule.title)}
-                        title="Delete capsule"
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                        <span>Delete</span>
-                      </button>
-                    </div>
-
-                    <Link href="/cart" className="ward-purchase-capsule-btn">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="8" cy="21" r="1" />
-                        <circle cx="19" cy="21" r="1" />
-                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-                      </svg>
-                      <span>Purchase Capsule Selection</span>
+                      <span>{t.openStudio}</span>
                     </Link>
                   </div>
                 </div>
@@ -473,36 +581,113 @@ export default function WardrobePage() {
           </div>
         )}
 
-        {/* Saved Garments tab placeholder */}
+        {/* ================= SAVED GARMENTS TAB ================= */}
         {activeTab === "saved" && (
-          <div style={{ background: "#ffffff", borderRadius: "18px", padding: "40px 20px", textAlign: "center", marginBottom: "26px", border: "1px solid #e2e8f0" }}>
-            <h3 style={{ fontSize: "16px", color: "#0f224a", marginBottom: "8px" }}>12 Saved Individual Garments</h3>
-            <p style={{ fontSize: "13px", color: "#64748b" }}>Blazers, Cashmere Sweaters, Silk Shirts, and Tailored Denim in your saved collection.</p>
+          <div className="ward-saved-grid">
+            {savedGarments.map((item) => (
+              <div key={item.id} className="ward-saved-card">
+                <div className="ward-saved-visual">
+                  <Image
+                    src={item.thumb}
+                    alt={item.name}
+                    width={140}
+                    height={160}
+                    className="ward-saved-img"
+                  />
+                  <span className="ward-saved-badge">{item.category}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSavedGarment(item.id, item.name)}
+                    style={{
+                      position: "absolute",
+                      top: "8px",
+                      right: "8px",
+                      width: "26px",
+                      height: "26px",
+                      borderRadius: "50%",
+                      background: "rgba(255, 255, 255, 0.9)",
+                      border: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                    }}
+                    title={lang === "FR" ? "Retirer de la garde-robe" : "Remove from Wardrobe"}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+                <div className="ward-saved-info">
+                  <span className="ward-saved-brand">{item.brand}</span>
+                  <h3 className="ward-saved-name">{item.name}</h3>
+                  <div className="ward-saved-price-row">
+                    <span className="ward-saved-price">{item.price}</span>
+                  </div>
+                  <div className="ward-saved-actions">
+                    <Link href="/3d-studio" className="ward-saved-try-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      </svg>
+                      <span>{t.tryInStudio}</span>
+                    </Link>
+                    <Link href="/cart" className="ward-saved-cart-btn" title="Add to Bag">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* History tab placeholder */}
+        {/* ================= TRY-ON HISTORY TAB ================= */}
         {activeTab === "history" && (
-          <div style={{ background: "#ffffff", borderRadius: "18px", padding: "40px 20px", textAlign: "center", marginBottom: "26px", border: "1px solid #e2e8f0" }}>
-            <h3 style={{ fontSize: "16px", color: "#0f224a", marginBottom: "8px" }}>28 Virtual Try-On Sessions Recorded</h3>
-            <p style={{ fontSize: "13px", color: "#64748b" }}>Complete tension heatmaps, fit score history, and sync comparisons.</p>
+          <div className="ward-history-list">
+            {TRY_ON_HISTORY.map((h) => (
+              <div key={h.id} className="ward-history-card">
+                <div className="ward-history-left">
+                  <div className="ward-history-thumb-wrap">
+                    <Image
+                      src={h.thumb}
+                      alt={h.name}
+                      width={44}
+                      height={50}
+                      className="ward-history-thumb"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="ward-history-name">{h.name}</h3>
+                    <p className="ward-history-formula">{h.formula}</p>
+                    <span className="ward-history-date">{h.date}</span>
+                  </div>
+                </div>
+
+                <div className="ward-history-right">
+                  <span className="ward-history-score">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    {h.fit}
+                  </span>
+                  <Link href="/3d-studio" className="ward-history-btn">
+                    <span>{t.reopenSession}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
-        {/* ================= BOTTOM BAR: MORE CAPSULES ================= */}
-        <section className="ward-more-capsules-box">
-          <div className="ward-more-title-group">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f224a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 4a3 3 0 0 1 3 3c0 1.3-.84 2.4-2 2.82V12l7 6H4l7-6V9.82C9.84 9.4 9 8.3 9 7a3 3 0 0 1 3-3z" />
-            </svg>
-            <h3 className="ward-more-title">More Capsules</h3>
-          </div>
-
-          <Link href="/catalog" className="ward-view-all-link">
-            <span>View All</span>
-            <span>→</span>
-          </Link>
-        </section>
       </div>
     </div>
   );

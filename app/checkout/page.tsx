@@ -1,23 +1,139 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
-
 import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
   const router = useRouter();
 
-  // Shipping Address Form State (pre-filled according to reference screenshot)
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const translations = {
+    EN: {
+      navHome: "Home",
+      navCatalog: "Catalog",
+      navStudio: "3D Studio",
+      navWardrobe: "Wardrobe",
+      navPricing: "Plans",
+      searchPlaceholder: "Search brands, styles, or items...",
+      cartTitle: "Cart",
+      profileTitle: "User Profile",
+      checkoutTitle: "Secure Checkout",
+      shippingTitle: "Shipping Address & Contact",
+      shippingSub: "Enter your delivery details so we can get your order to you.",
+      firstName: "First Name *",
+      lastName: "Last Name *",
+      streetAddress: "Street Address *",
+      city: "City *",
+      phoneNumber: "Phone Number *",
+      paymentTitle: "Payment Method",
+      paymentSub: "Choose your preferred payment method. All transactions are secure and encrypted.",
+      appleGoogleTitle: "Apple Pay / Google Pay",
+      appleGoogleSub: "1-click express checkout",
+      fastSecure: "Fast & Secure",
+      cardTitle: "Credit / Debit Card",
+      cardSub: "Pay with your card details",
+      securePayments: "Secure Payments",
+      cardNumber: "Card Number",
+      expiryDate: "Expiry Date",
+      cvc: "CVC",
+      cardName: "Name on Card",
+      klarnaTitle: "Klarna / Afterpay",
+      klarnaSub: "4 interest-free installments of $322.50",
+      noExtraFees: "No extra fees",
+      partnerTitle: "Partner Store Direct Checkout",
+      partnerSub: "Zalando Checkout Redirect",
+      redirectZalando: "Redirects to Zalando",
+      orderSummary: "Order Summary",
+      productTitle: "Balmain Structured Blazer",
+      productSpecs: "Size: M • Navy Blue",
+      qty: "Qty: 1",
+      subtotal: "Subtotal",
+      shipping: "Shipping",
+      free: "Free",
+      estimatedTax: "Estimated Tax",
+      included: "Included",
+      total: "Total",
+      securityNotice: "Card details are never stored by FitVisor (PCI-DSS tokenized banking).",
+      confirmPay: "Confirm and Pay $1,290.00",
+    },
+    FR: {
+      navHome: "Accueil",
+      navCatalog: "Catalogue",
+      navStudio: "Studio 3D",
+      navWardrobe: "Garde-robe",
+      navPricing: "Tarifs",
+      searchPlaceholder: "Rechercher des marques, styles...",
+      cartTitle: "Panier",
+      profileTitle: "Profil utilisateur",
+      checkoutTitle: "Paiement sécurisé",
+      shippingTitle: "Adresse de livraison & Contact",
+      shippingSub: "Entrez vos coordonnées pour recevoir votre commande.",
+      firstName: "Prénom *",
+      lastName: "Nom *",
+      streetAddress: "Adresse de livraison *",
+      city: "Ville *",
+      phoneNumber: "Numéro de téléphone *",
+      paymentTitle: "Moyen de paiement",
+      paymentSub: "Choisissez votre moyen de paiement préféré. Transactions sécurisées et chiffrées.",
+      appleGoogleTitle: "Apple Pay / Google Pay",
+      appleGoogleSub: "Paiement express en 1 clic",
+      fastSecure: "Rapide & Sécurisé",
+      cardTitle: "Carte bancaire / Débit",
+      cardSub: "Payez avec vos coordonnées de carte",
+      securePayments: "Paiements sécurisés",
+      cardNumber: "Numéro de carte",
+      expiryDate: "Date d'expiration",
+      cvc: "CVC",
+      cardName: "Nom sur la carte",
+      klarnaTitle: "Klarna / Afterpay",
+      klarnaSub: "4 versements sans frais de 322,50 $",
+      noExtraFees: "Sans frais supplémentaires",
+      partnerTitle: "Règlement direct magasin partenaire",
+      partnerSub: "Redirection vers le paiement Zalando",
+      redirectZalando: "Redirige vers Zalando",
+      orderSummary: "Résumé de la commande",
+      productTitle: "Blazer Structuré Balmain",
+      productSpecs: "Taille : M • Bleu marine",
+      qty: "Qté : 1",
+      subtotal: "Sous-total",
+      shipping: "Livraison",
+      free: "Gratuit",
+      estimatedTax: "Taxe estimée",
+      included: "Incluse",
+      total: "Total",
+      securityNotice: "Vos coordonnées bancaires ne sont jamais stockées par FitVisor (chiffrement bancaire PCI-DSS).",
+      confirmPay: "Confirmer et Payer 1 290,00 $",
+    },
+  };
+
+  const t = translations[lang];
+
+  // Shipping Address Form State
   const [firstName, setFirstName] = useState("Mohib");
   const [lastName, setLastName] = useState("Wajid");
   const [streetAddress, setStreetAddress] = useState("House # 123, Main Road, Johar Town");
   const [city, setCity] = useState("Lahore");
   const [phoneNumber, setPhoneNumber] = useState("+92 300 1234567");
 
-  // Payment Method Selection (default: apple-google as in screenshot)
+  // Payment Method Selection
   const [paymentMethod, setPaymentMethod] = useState<"apple-google" | "card" | "klarna" | "zalando">("apple-google");
 
   // Card details
@@ -34,44 +150,67 @@ export default function CheckoutPage() {
   return (
     <div className="chk-page-wrapper">
       <div className="chk-container">
-        {/* ================= HEADER / NAVBAR ================= */}
+        {/* ================= UNIVERSAL HEADER / NAVBAR ================= */}
         <header className="cat-navbar" style={{ marginBottom: "26px" }}>
+          {/* Brand Logo - Row 1 Left */}
           <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
           <nav className="cat-nav-menu">
             <Link href="/" className="cat-nav-item">
-              Home
+              {t.navHome}
             </Link>
             <Link href="/catalog" className="cat-nav-item">
-              Catalog
+              {t.navCatalog}
             </Link>
             <Link href="/3d-studio" className="cat-nav-item">
-              3D Studio
+              {t.navStudio}
             </Link>
             <Link href="/wardrobe" className="cat-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="/community" className="cat-nav-item">
-              Community
+              {t.navWardrobe}
             </Link>
           </nav>
 
+          {/* Search Bar - Desktop Right / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
           <div className="cat-nav-actions">
-            <div className="cat-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                className="cat-search-input"
-              />
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="chk-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="chk-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <Link href="/cart" className="cat-cart-btn" title="Cart" style={{ textDecoration: "none" }}>
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
@@ -80,7 +219,8 @@ export default function CheckoutPage() {
               <span className="cat-cart-badge">1</span>
             </Link>
 
-            <Link href="/profile" className="cat-user-avatar-wrap" style={{ display: "flex", alignItems: "center", gap: "4px", textDecoration: "none" }}>
+            {/* User Profile Avatar */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
@@ -88,9 +228,6 @@ export default function CheckoutPage() {
                 height={32}
                 className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
             </Link>
           </div>
         </header>
@@ -104,8 +241,8 @@ export default function CheckoutPage() {
               <div className="chk-sec-header">
                 <div className="chk-step-num">1</div>
                 <div className="chk-sec-title-group">
-                  <h1 className="chk-sec-title">Shipping Address &amp; Contact</h1>
-                  <p className="chk-sec-sub">Enter your delivery details so we can get your order to you.</p>
+                  <h1 className="chk-sec-title">{t.shippingTitle}</h1>
+                  <p className="chk-sec-sub">{t.shippingSub}</p>
                 </div>
               </div>
 
@@ -118,7 +255,7 @@ export default function CheckoutPage() {
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                     <div className="chk-field-inner">
-                      <label className="chk-field-label">First Name *</label>
+                      <label className="chk-field-label">{t.firstName}</label>
                       <input
                         type="text"
                         required
@@ -135,7 +272,7 @@ export default function CheckoutPage() {
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                     <div className="chk-field-inner">
-                      <label className="chk-field-label">Last Name *</label>
+                      <label className="chk-field-label">{t.lastName}</label>
                       <input
                         type="text"
                         required
@@ -154,7 +291,7 @@ export default function CheckoutPage() {
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
                   <div className="chk-field-inner">
-                    <label className="chk-field-label">Street Address *</label>
+                    <label className="chk-field-label">{t.streetAddress}</label>
                     <input
                       type="text"
                       required
@@ -179,7 +316,7 @@ export default function CheckoutPage() {
                       <path d="M14 17h1"></path>
                     </svg>
                     <div className="chk-field-inner">
-                      <label className="chk-field-label">City *</label>
+                      <label className="chk-field-label">{t.city}</label>
                       <select
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
@@ -205,7 +342,7 @@ export default function CheckoutPage() {
                       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                     </svg>
                     <div className="chk-field-inner">
-                      <label className="chk-field-label">Phone Number *</label>
+                      <label className="chk-field-label">{t.phoneNumber}</label>
                       <input
                         type="text"
                         required
@@ -224,8 +361,8 @@ export default function CheckoutPage() {
               <div className="chk-sec-header">
                 <div className="chk-step-num">2</div>
                 <div className="chk-sec-title-group">
-                  <h2 className="chk-sec-title">Payment Method</h2>
-                  <p className="chk-sec-sub">Choose your preferred payment method. All transactions are secure and encrypted.</p>
+                  <h2 className="chk-sec-title">{t.paymentTitle}</h2>
+                  <p className="chk-sec-sub">{t.paymentSub}</p>
                 </div>
               </div>
 
@@ -267,8 +404,8 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="chk-pay-info">
-                        <span className="chk-pay-title">Apple Pay / Google Pay</span>
-                        <span className="chk-pay-sub">1-click express checkout</span>
+                        <span className="chk-pay-title">{t.appleGoogleTitle}</span>
+                        <span className="chk-pay-sub">{t.appleGoogleSub}</span>
                       </div>
                     </div>
 
@@ -276,7 +413,7 @@ export default function CheckoutPage() {
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                       </svg>
-                      <span>Fast &amp; Secure</span>
+                      <span>{t.fastSecure}</span>
                     </div>
                   </div>
                 </div>
@@ -321,8 +458,8 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="chk-pay-info">
-                        <span className="chk-pay-title">Credit / Debit Card</span>
-                        <span className="chk-pay-sub">Pay with your card details</span>
+                        <span className="chk-pay-title">{t.cardTitle}</span>
+                        <span className="chk-pay-sub">{t.cardSub}</span>
                       </div>
                     </div>
 
@@ -331,7 +468,7 @@ export default function CheckoutPage() {
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                       </svg>
-                      <span>Secure Payments</span>
+                      <span>{t.securePayments}</span>
                     </div>
                   </div>
 
@@ -344,7 +481,7 @@ export default function CheckoutPage() {
                           <line x1="1" y1="10" x2="23" y2="10"></line>
                         </svg>
                         <div className="chk-field-inner">
-                          <label className="chk-field-label">Card Number</label>
+                          <label className="chk-field-label">{t.cardNumber}</label>
                           <input
                             type="text"
                             value={cardNumber}
@@ -362,7 +499,7 @@ export default function CheckoutPage() {
                           <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
                         <div className="chk-field-inner">
-                          <label className="chk-field-label">Expiry Date</label>
+                          <label className="chk-field-label">{t.expiryDate}</label>
                           <input
                             type="text"
                             value={expiryDate}
@@ -378,7 +515,7 @@ export default function CheckoutPage() {
                           <line x1="2" y1="10" x2="22" y2="10"></line>
                         </svg>
                         <div className="chk-field-inner">
-                          <label className="chk-field-label">CVC</label>
+                          <label className="chk-field-label">{t.cvc}</label>
                           <input
                             type="text"
                             value={cvc}
@@ -395,7 +532,7 @@ export default function CheckoutPage() {
                         <circle cx="12" cy="7" r="4"></circle>
                       </svg>
                       <div className="chk-field-inner">
-                        <label className="chk-field-label">Name on Card</label>
+                        <label className="chk-field-label">{t.cardName}</label>
                         <input
                           type="text"
                           value={cardName}
@@ -439,8 +576,8 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="chk-pay-info">
-                        <span className="chk-pay-title">Klarna / Afterpay</span>
-                        <span className="chk-pay-sub">4 interest-free installments of $322.50</span>
+                        <span className="chk-pay-title">{t.klarnaTitle}</span>
+                        <span className="chk-pay-sub">{t.klarnaSub}</span>
                       </div>
                     </div>
 
@@ -450,7 +587,7 @@ export default function CheckoutPage() {
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                       </svg>
-                      <span>No extra fees</span>
+                      <span>{t.noExtraFees}</span>
                     </div>
                   </div>
                 </div>
@@ -485,8 +622,8 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="chk-pay-info">
-                        <span className="chk-pay-title">Partner Store Direct Checkout</span>
-                        <span className="chk-pay-sub">Zalando Checkout Redirect</span>
+                        <span className="chk-pay-title">{t.partnerTitle}</span>
+                        <span className="chk-pay-sub">{t.partnerSub}</span>
                       </div>
                     </div>
 
@@ -496,7 +633,7 @@ export default function CheckoutPage() {
                         <polyline points="15 3 21 3 21 9"></polyline>
                         <line x1="10" y1="14" x2="21" y2="3"></line>
                       </svg>
-                      <span>Redirects to Zalando</span>
+                      <span>{t.redirectZalando}</span>
                     </div>
                   </div>
                 </div>
@@ -514,7 +651,7 @@ export default function CheckoutPage() {
                 <line x1="16" y1="17" x2="8" y2="17"></line>
                 <polyline points="10 9 9 9 8 9"></polyline>
               </svg>
-              <span>Order Summary</span>
+              <span>{t.orderSummary}</span>
             </h2>
 
             {/* Mini Product Preview Card */}
@@ -522,7 +659,7 @@ export default function CheckoutPage() {
               <div className="chk-item-thumb-wrap">
                 <Image
                   src="/images/cart/balmain_suit_card.png"
-                  alt="Balmain Structured Blazer"
+                  alt={t.productTitle}
                   width={58}
                   height={74}
                   className="chk-item-thumb"
@@ -532,37 +669,37 @@ export default function CheckoutPage() {
 
               <div className="chk-item-meta">
                 <span className="chk-item-brand">BALMAIN PARIS</span>
-                <span className="chk-item-title">Balmain Structured Blazer</span>
-                <span className="chk-item-specs">Size: M • Navy Blue</span>
+                <span className="chk-item-title">{t.productTitle}</span>
+                <span className="chk-item-specs">{t.productSpecs}</span>
               </div>
 
               <div className="chk-item-price-col">
                 <span className="chk-item-price">$1,290.00</span>
-                <span className="chk-item-qty">Qty: 1</span>
+                <span className="chk-item-qty">{t.qty}</span>
               </div>
             </div>
 
             {/* Summary Line Items */}
             <div className="chk-summary-lines">
               <div className="chk-summary-line">
-                <span className="chk-line-label">Subtotal</span>
+                <span className="chk-line-label">{t.subtotal}</span>
                 <span className="chk-line-val">$1,290.00</span>
               </div>
 
               <div className="chk-summary-line">
-                <span className="chk-line-label">Shipping</span>
-                <span className="chk-line-val green">Free</span>
+                <span className="chk-line-label">{t.shipping}</span>
+                <span className="chk-line-val green">{t.free}</span>
               </div>
 
               <div className="chk-summary-line">
-                <span className="chk-line-label">Estimated Tax</span>
-                <span className="chk-line-val muted">Included</span>
+                <span className="chk-line-label">{t.estimatedTax}</span>
+                <span className="chk-line-val muted">{t.included}</span>
               </div>
 
               <div className="chk-divider"></div>
 
               <div className="chk-total-row">
-                <span className="chk-total-label">Total</span>
+                <span className="chk-total-label">{t.total}</span>
                 <span className="chk-total-val">$1,290.00</span>
               </div>
             </div>
@@ -574,7 +711,7 @@ export default function CheckoutPage() {
                 <polyline points="9 12 11 14 15 10"></polyline>
               </svg>
               <span className="chk-security-text">
-                Card details are never stored by FitVisor (PCI-DSS tokenized banking).
+                {t.securityNotice}
               </span>
             </div>
 
@@ -584,7 +721,7 @@ export default function CheckoutPage() {
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              <span>Confirm and Pay $1,290.00</span>
+              <span>{t.confirmPay}</span>
               <span style={{ marginLeft: "4px" }}>→</span>
             </button>
           </aside>

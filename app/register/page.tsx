@@ -1,9 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Logo from "@/components/Logo";
+
+const translations = {
+  EN: {
+    account: "Account",
+    privacy: "Privacy & Anonymity",
+    createAvatar: "Create Avatar",
+    title: "Create Your Fitvisor Profile",
+    subtitle: "Get started with your virtual wardrobe and 3D try-on experience.",
+    firstName: "First Name",
+    firstNamePlaceholder: "Enter your first name",
+    lastName: "Last Name",
+    lastNamePlaceholder: "Enter your last name",
+    email: "Email address",
+    emailPlaceholder: "you@example.com",
+    password: "Password",
+    passwordPlaceholder: "Create a strong password",
+    passwordStrength: "Password strength:",
+    weak: "Weak",
+    dob: "Date of Birth",
+    day: "Day",
+    month: "Month",
+    year: "Year",
+    complianceTitle: "Compliance Notice:",
+    complianceDesc: "Fitvisor is strictly reserved for users aged 16+ for biometric and body data processing.",
+    continueBtn: "Continue to Privacy Consent",
+    alreadyAccount: "Already have an account?",
+    signIn: "Sign In",
+    months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  },
+  FR: {
+    account: "Compte",
+    privacy: "Confidentialité & Anonymat",
+    createAvatar: "Créer un Avatar",
+    title: "Créez votre profil Fitvisor",
+    subtitle: "Commencez votre expérience avec votre garde-robe virtuelle et vos essayages 3D.",
+    firstName: "Prénom",
+    firstNamePlaceholder: "Entrez votre prénom",
+    lastName: "Nom",
+    lastNamePlaceholder: "Entrez votre nom",
+    email: "Adresse e-mail",
+    emailPlaceholder: "vous@exemple.com",
+    password: "Mot de passe",
+    passwordPlaceholder: "Créez un mot de passe sécurisé",
+    passwordStrength: "Force du mot de passe :",
+    weak: "Faible",
+    dob: "Date de naissance",
+    day: "Jour",
+    month: "Mois",
+    year: "Année",
+    complianceTitle: "Avis de conformité :",
+    complianceDesc: "Fitvisor est strictement réservé aux utilisateurs de 16 ans et plus pour le traitement des données biométriques.",
+    continueBtn: "Continuer vers le consentement",
+    alreadyAccount: "Vous avez déjà un compte ?",
+    signIn: "Se connecter",
+    months: ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"],
+  },
+};
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -15,6 +72,23 @@ export default function RegisterPage() {
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const t = translations[lang];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,11 +96,41 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="login-page-wrapper" style={{ padding: "30px 16px" }}>
-      <div className="login-card register-card">
-        {/* Top FitVisor Logo */}
-        <div className="register-logo-row">
-          <Logo size="md" />
+    <div className="register-page-wrapper">
+      {/* Top Right Language Switch */}
+      <div className="login-lang-switch">
+        <button
+          type="button"
+          id="reg-lang-btn-en"
+          onClick={() => changeLang("EN")}
+          className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+        >
+          EN
+        </button>
+        <span className="lang-pipe">|</span>
+        <button
+          type="button"
+          id="reg-lang-btn-fr"
+          onClick={() => changeLang("FR")}
+          className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+        >
+          FR
+        </button>
+      </div>
+
+      <div className="register-card">
+        {/* Official FitVisor Logo */}
+        <div className="register-logo-container">
+          <Link href="/" title="FitVisor Home">
+            <Image
+              src="/images/fitvisor_logo_square.png"
+              alt="FitVisor"
+              width={120}
+              height={120}
+              priority
+              className="register-logo-img"
+            />
+          </Link>
         </div>
 
         {/* 3-Step Wizard Indicator */}
@@ -34,7 +138,7 @@ export default function RegisterPage() {
           {/* Step 1: Account (Active) */}
           <div className="wizard-step-item active">
             <div className="step-circle active">1</div>
-            <span className="step-label active">Account</span>
+            <span className="step-label active">{t.account}</span>
           </div>
 
           <div className="step-connector-line" />
@@ -42,7 +146,7 @@ export default function RegisterPage() {
           {/* Step 2: Privacy */}
           <div className="wizard-step-item">
             <div className="step-circle">2</div>
-            <span className="step-label">Privacy</span>
+            <span className="step-label">{t.privacy}</span>
           </div>
 
           <div className="step-connector-line" />
@@ -50,16 +154,14 @@ export default function RegisterPage() {
           {/* Step 3: Create Avatar */}
           <div className="wizard-step-item">
             <div className="step-circle">3</div>
-            <span className="step-label">Create Avatar</span>
+            <span className="step-label">{t.createAvatar}</span>
           </div>
         </div>
 
         {/* Section Heading */}
         <div className="register-heading-block">
-          <h1 className="register-title">Create Your Fitvisor Profile</h1>
-          <p className="register-subtitle">
-            Get started with your virtual wardrobe and 3D try-on experience.
-          </p>
+          <h1 className="register-title">{t.title}</h1>
+          <p className="register-subtitle">{t.subtitle}</p>
         </div>
 
         {/* Registration Form */}
@@ -67,7 +169,7 @@ export default function RegisterPage() {
           {/* First Name & Last Name (2 Columns) */}
           <div className="register-two-col">
             <div className="form-field-group">
-              <label className="field-label">First Name</label>
+              <label className="field-label">{t.firstName}</label>
               <div className="register-input-wrap">
                 <span className="reg-icon">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -77,7 +179,7 @@ export default function RegisterPage() {
                 </span>
                 <input
                   type="text"
-                  placeholder="Enter your first name"
+                  placeholder={t.firstNamePlaceholder}
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   className="reg-input"
@@ -87,7 +189,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="form-field-group">
-              <label className="field-label">Last Name</label>
+              <label className="field-label">{t.lastName}</label>
               <div className="register-input-wrap">
                 <span className="reg-icon">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -97,7 +199,7 @@ export default function RegisterPage() {
                 </span>
                 <input
                   type="text"
-                  placeholder="Enter your last name"
+                  placeholder={t.lastNamePlaceholder}
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className="reg-input"
@@ -109,7 +211,7 @@ export default function RegisterPage() {
 
           {/* Email Address */}
           <div className="form-field-group">
-            <label className="field-label">Email address</label>
+            <label className="field-label">{t.email}</label>
             <div className="register-input-wrap">
               <span className="reg-icon">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -119,7 +221,7 @@ export default function RegisterPage() {
               </span>
               <input
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="reg-input"
@@ -130,7 +232,7 @@ export default function RegisterPage() {
 
           {/* Password */}
           <div className="form-field-group">
-            <label className="field-label">Password</label>
+            <label className="field-label">{t.password}</label>
             <div className="register-input-wrap">
               <span className="reg-icon">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -140,7 +242,7 @@ export default function RegisterPage() {
               </span>
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Create a strong password"
+                placeholder={t.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="reg-input"
@@ -169,14 +271,14 @@ export default function RegisterPage() {
                 <div className="strength-segment" />
               </div>
               <span className="strength-text">
-                Password strength: <span className="weak-label">Weak</span>
+                {t.passwordStrength} <span className="weak-label">{t.weak}</span>
               </span>
             </div>
           </div>
 
           {/* Date of Birth */}
           <div className="form-field-group">
-            <label className="field-label">Date of Birth</label>
+            <label className="field-label">{t.dob}</label>
             <div className="dob-dropdowns-row">
               {/* Day */}
               <div className="select-wrap-box">
@@ -189,7 +291,7 @@ export default function RegisterPage() {
                   </svg>
                 </span>
                 <select value={day} onChange={(e) => setDay(e.target.value)} className="dob-select">
-                  <option value="">Day</option>
+                  <option value="">{t.day}</option>
                   {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
                     <option key={d} value={d}>
                       {d}
@@ -202,8 +304,8 @@ export default function RegisterPage() {
               {/* Month */}
               <div className="select-wrap-box">
                 <select value={month} onChange={(e) => setMonth(e.target.value)} className="dob-select no-left-icon">
-                  <option value="">Month</option>
-                  {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, idx) => (
+                  <option value="">{t.month}</option>
+                  {t.months.map((m, idx) => (
                     <option key={idx} value={m}>
                       {m}
                     </option>
@@ -215,7 +317,7 @@ export default function RegisterPage() {
               {/* Year */}
               <div className="select-wrap-box">
                 <select value={year} onChange={(e) => setYear(e.target.value)} className="dob-select no-left-icon">
-                  <option value="">Year</option>
+                  <option value="">{t.year}</option>
                   {Array.from({ length: 70 }, (_, i) => 2010 - i).map((y) => (
                     <option key={y} value={y}>
                       {y}
@@ -237,9 +339,9 @@ export default function RegisterPage() {
               </svg>
             </div>
             <div className="notice-body">
-              <span className="notice-title">Compliance Notice:</span>
+              <span className="notice-title">{t.complianceTitle}</span>
               <p className="notice-desc">
-                Fitvisor is strictly reserved for users aged 16+ for biometric and body data processing.
+                {t.complianceDesc}
               </p>
             </div>
             <div className="notice-right-info">
@@ -253,7 +355,7 @@ export default function RegisterPage() {
 
           {/* Submit Button */}
           <button type="submit" className="register-submit-btn">
-            <span>Continue to Privacy Consent</span>
+            <span>{t.continueBtn}</span>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
@@ -263,9 +365,9 @@ export default function RegisterPage() {
 
         {/* Footer Link */}
         <div className="register-card-footer">
-          <span>Already have an account?</span>{" "}
+          <span>{t.alreadyAccount}</span>{" "}
           <Link href="/login" className="reg-signin-link">
-            Sign In
+            {t.signIn}
           </Link>
         </div>
       </div>

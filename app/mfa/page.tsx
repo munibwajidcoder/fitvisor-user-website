@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 
@@ -11,6 +12,20 @@ export default function MFAPage() {
   const [timer, setTimer] = useState<number>(45);
   const [lang, setLang] = useState<"EN" | "FR">("EN");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
 
   // Countdown timer effect
   useEffect(() => {
@@ -73,7 +88,7 @@ export default function MFAPage() {
       <div className="login-lang-switch">
         <button
           type="button"
-          onClick={() => setLang("EN")}
+          onClick={() => changeLang("EN")}
           className={`lang-btn ${lang === "EN" ? "active" : ""}`}
         >
           EN
@@ -81,7 +96,7 @@ export default function MFAPage() {
         <span className="lang-pipe">|</span>
         <button
           type="button"
-          onClick={() => setLang("FR")}
+          onClick={() => changeLang("FR")}
           className={`lang-btn ${lang === "FR" ? "active" : ""}`}
         >
           FR
@@ -91,8 +106,17 @@ export default function MFAPage() {
       {/* Main MFA Card */}
       <div className="login-card mfa-card">
         {/* FitVisor Logo */}
-        <div className="mfa-logo-row">
-          <Logo size="md" />
+        <div className="login-logo-container">
+          <Link href="/" title="FitVisor Home">
+            <Image
+              src="/images/fitvisor_logo_square.png"
+              alt="FitVisor"
+              width={120}
+              height={120}
+              priority
+              className="login-logo-img"
+            />
+          </Link>
         </div>
 
         {/* Shield Icon Badge */}

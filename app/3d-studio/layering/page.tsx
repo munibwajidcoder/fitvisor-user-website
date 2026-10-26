@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
@@ -10,6 +10,7 @@ interface LayerItem {
   order: number;
   brand: string;
   name: string;
+  nameFr: string;
   priceNum: number;
   priceStr: string;
   thumb: string;
@@ -18,7 +19,69 @@ interface LayerItem {
   selected: boolean;
 }
 
+const translations = {
+  EN: {
+    navHome: "Home",
+    navCatalog: "Catalog",
+    navStudio: "3D Studio",
+    navWardrobe: "Wardrobe",
+    searchPlaceholder: "Search brands, styles, or items...",
+    cart: "Cart",
+    userProfile: "User Profile",
+    outfitLayers: "Outfit Layers",
+    itemsCount: "(4 items)",
+    layerSubtitle: "Drag to reorder • Toggle visibility",
+    addGarment: "Add Garment to Outfit",
+    studioLighting: "Studio Lighting",
+    daylight: "Daylight\n(5500K)",
+    storeLight: "Store\nLighting",
+    eveningGala: "Evening\nGala",
+    dragRotate: "Drag to rotate 360°",
+    completeOutfit: "Complete Outfit",
+    saveBadge: "4 items • Save 12%",
+    aiScoreTitle: "AI Style Compatibility Score",
+    aiScoreSub: "Timeless navy & off-white chromatic harmony.",
+    selectAll: "Select All for Cart",
+    itemsSelected: "items selected",
+    swapShoes: "Swap Shoes",
+    pumpsVsSneakers: "Pumps vs Sneakers",
+    sneakersVsPumps: "Sneakers vs Pumps",
+    addCompleteOutfit: "Add Complete Outfit to Cart",
+    toastAdded: "Complete outfit added to your cart!",
+  },
+  FR: {
+    navHome: "Accueil",
+    navCatalog: "Catalogue",
+    navStudio: "Studio 3D",
+    navWardrobe: "Garde-robe",
+    searchPlaceholder: "Rechercher des marques, styles, ou articles...",
+    cart: "Panier",
+    userProfile: "Profil Utilisateur",
+    outfitLayers: "Couches de Tenue",
+    itemsCount: "(4 articles)",
+    layerSubtitle: "Glisser pour réorganiser • Activer visibilité",
+    addGarment: "Ajouter un vêtement à la tenue",
+    studioLighting: "Éclairage Studio",
+    daylight: "Lumière du jour\n(5500K)",
+    storeLight: "Éclairage\nBoutique",
+    eveningGala: "Soirée\nGala",
+    dragRotate: "Glisser pour pivoter à 360°",
+    completeOutfit: "Tenue Complète",
+    saveBadge: "4 articles • Économisez 12%",
+    aiScoreTitle: "Score d'harmonie stylistique IA",
+    aiScoreSub: "Harmonie chromatique intemporelle marine et blanc cassé.",
+    selectAll: "Tout sélectionner pour le panier",
+    itemsSelected: "articles sélectionnés",
+    swapShoes: "Changer de chaussures",
+    pumpsVsSneakers: "Escarpins vs Baskets",
+    sneakersVsPumps: "Baskets vs Escarpins",
+    addCompleteOutfit: "Ajouter la tenue complète au panier",
+    toastAdded: "Tenue complète ajoutée à votre panier !",
+  },
+};
+
 export default function MultiGarmentLayeringPage() {
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
   const [activeLighting, setActiveLighting] = useState<"daylight" | "store" | "evening">("daylight");
   const [rotationAngle, setRotationAngle] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -26,6 +89,25 @@ export default function MultiGarmentLayeringPage() {
   const [dragStartX, setDragStartX] = useState(0);
   const [cartCount, setCartCount] = useState(3);
   const [shoesType, setShoesType] = useState<"pumps" | "sneakers">("pumps");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fitvisor_lang") as "EN" | "FR" | null;
+      if (saved === "EN" || saved === "FR") {
+        setLang(saved);
+      }
+    } catch {}
+  }, []);
+
+  const changeLang = (l: "EN" | "FR") => {
+    setLang(l);
+    try {
+      localStorage.setItem("fitvisor_lang", l);
+    } catch {}
+  };
+
+  const t = translations[lang];
 
   const [layers, setLayers] = useState<LayerItem[]>([
     {
@@ -33,6 +115,7 @@ export default function MultiGarmentLayeringPage() {
       order: 1,
       brand: "BRUNELLO CUCINELLI",
       name: "Italian Collar Silk Shirt",
+      nameFr: "Chemise en Soie Col Italien",
       priceNum: 520,
       priceStr: "$520.00",
       thumb: "/images/layering/thumb_shirt.png",
@@ -45,6 +128,7 @@ export default function MultiGarmentLayeringPage() {
       order: 2,
       brand: "BALMAIN",
       name: "Wool Structured Blazer",
+      nameFr: "Blazer Structuré en Laine",
       priceNum: 1290,
       priceStr: "$1,290.00",
       thumb: "/images/layering/thumb_blazer.png",
@@ -57,6 +141,7 @@ export default function MultiGarmentLayeringPage() {
       order: 3,
       brand: "BALMAIN",
       name: "Belted Tailored Trousers",
+      nameFr: "Pantalon Tailleur Ceinturé",
       priceNum: 420,
       priceStr: "$420.00",
       thumb: "/images/layering/thumb_trousers.png",
@@ -69,6 +154,7 @@ export default function MultiGarmentLayeringPage() {
       order: 4,
       brand: "JIMMY CHOO",
       name: "Leather Stiletto Pumps",
+      nameFr: "Escarpins Stiletto en Cuir",
       priceNum: 210,
       priceStr: "$210.00",
       thumb: "/images/layering/thumb_heels.png",
@@ -133,7 +219,12 @@ export default function MultiGarmentLayeringPage() {
   };
 
   const handleAddToCart = () => {
-    setCartCount((prev) => prev + (selectedCount > 0 ? selectedCount : 1));
+    const count = selectedCount > 0 ? selectedCount : 1;
+    setCartCount((prev) => prev + count);
+    setToastMessage(t.toastAdded);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3200);
   };
 
   const toggleSwapShoes = () => {
@@ -146,71 +237,97 @@ export default function MultiGarmentLayeringPage() {
       onMouseUp={handleMouseUp}
     >
       <div className="lay-container">
-        {/* ================= HEADER / NAVBAR ================= */}
-        <header className="stu-navbar">
-          <div className="stu-nav-brand">
+        {/* ================= HEADER / NAVBAR (Standard cat-navbar) ================= */}
+        <header className="cat-navbar" style={{ marginBottom: "26px" }}>
+          {/* Brand Logo - Row 1 Left */}
+          <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
-          <nav className="stu-nav-menu">
-            <Link href="/" className="stu-nav-item">
-              Home
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
+          <nav className="cat-nav-menu">
+            <Link href="/" className="cat-nav-item">
+              {t.navHome}
             </Link>
-            <Link href="/catalog" className="stu-nav-item">
-              Catalog
+            <Link href="/catalog" className="cat-nav-item">
+              {t.navCatalog}
             </Link>
-            <Link href="/3d-studio" className="stu-nav-item active">
-              3D Studio
+            <Link href="/3d-studio" className="cat-nav-item active">
+              {t.navStudio}
             </Link>
-            <Link href="#wardrobe" className="stu-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="#community" className="stu-nav-item">
-              Community
+            <Link href="/wardrobe" className="cat-nav-item">
+              {t.navWardrobe}
             </Link>
           </nav>
 
-          <div className="stu-nav-actions">
-            <div className="stu-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                className="stu-search-input"
-              />
+          {/* Search Pill - Center Right (Desktop) / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Language, Cart, Profile - Row 1 Right */}
+          <div className="cat-nav-actions">
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="lay-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="lay-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <button
-              type="button"
-              className="stu-cart-btn"
-              title="Cart"
-              onClick={() => setCartCount((prev) => prev + 1)}
-            >
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn" title={t.cart} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span className="stu-cart-badge">{cartCount}</span>
-            </button>
+              <span className="cat-cart-badge">{cartCount}</span>
+            </Link>
 
-            <Link href="/digital-twin" className="stu-user-avatar-wrap" title="User Profile">
+            {/* User Profile Avatar */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.userProfile}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
                 width={32}
                 height={32}
-                className="stu-user-avatar-img"
+                className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
             </Link>
           </div>
         </header>
+
+        {/* Floating Toast Notification */}
+        {toastMessage && (
+          <div className="cat-toast-banner" role="alert" style={{ zIndex: 120 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>{toastMessage}</span>
+          </div>
+        )}
 
         {/* ================= 3-COLUMN STUDIO LAYOUT ================= */}
         <div className="lay-stage-grid">
@@ -224,10 +341,10 @@ export default function MultiGarmentLayeringPage() {
                   <polyline points="2 12 12 17 22 12" />
                 </svg>
                 <h2 className="lay-title">
-                  Outfit Layers <span>(4 items)</span>
+                  {t.outfitLayers} <span>{t.itemsCount}</span>
                 </h2>
               </div>
-              <span className="lay-subtitle">Drag to reorder &bull; Toggle visibility</span>
+              <span className="lay-subtitle">{t.layerSubtitle}</span>
             </div>
 
             {/* 4 Layer Items */}
@@ -246,7 +363,7 @@ export default function MultiGarmentLayeringPage() {
                   <div className="lay-thumb-wrap">
                     <Image
                       src={item.thumb}
-                      alt={item.name}
+                      alt={lang === "FR" ? item.nameFr : item.name}
                       width={40}
                       height={44}
                       className="lay-thumb"
@@ -255,7 +372,7 @@ export default function MultiGarmentLayeringPage() {
 
                   <div className="lay-info">
                     <span className="lay-brand">{item.brand}</span>
-                    <span className="lay-name">{item.name}</span>
+                    <span className="lay-name">{lang === "FR" ? item.nameFr : item.name}</span>
                     <span className="lay-price">{item.priceStr}</span>
                   </div>
 
@@ -264,7 +381,7 @@ export default function MultiGarmentLayeringPage() {
                       type="button"
                       className="lay-icon-btn"
                       onClick={() => toggleVisibility(item.id)}
-                      title="Toggle Layer Visibility"
+                      title={item.visible ? "Hide layer" : "Show layer"}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         {item.visible ? (
@@ -300,7 +417,7 @@ export default function MultiGarmentLayeringPage() {
                 <line x1="12" x2="12" y1="5" y2="19" />
                 <line x1="5" x2="19" y1="12" y2="12" />
               </svg>
-              <span>Add Garment to Outfit</span>
+              <span>{t.addGarment}</span>
             </Link>
           </aside>
 
@@ -317,7 +434,7 @@ export default function MultiGarmentLayeringPage() {
                   <circle cx="12" cy="12" r="4" />
                   <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
                 </svg>
-                <span className="stu-lighting-title">Studio Lighting</span>
+                <span className="stu-lighting-title">{t.studioLighting}</span>
               </div>
               <div className="stu-lighting-options">
                 <button
@@ -336,7 +453,7 @@ export default function MultiGarmentLayeringPage() {
                       <line x1="21" x2="23" y1="12" y2="12" />
                     </svg>
                   </div>
-                  <span className="stu-light-label">Daylight<br />(5500K)</span>
+                  <span className="stu-light-label" style={{ whiteSpace: "pre-line" }}>{t.daylight}</span>
                 </button>
 
                 <button
@@ -350,7 +467,7 @@ export default function MultiGarmentLayeringPage() {
                       <polyline points="9 22 9 12 15 12 15 22" />
                     </svg>
                   </div>
-                  <span className="stu-light-label">Store<br />Lighting</span>
+                  <span className="stu-light-label" style={{ whiteSpace: "pre-line" }}>{t.storeLight}</span>
                 </button>
 
                 <button
@@ -363,7 +480,7 @@ export default function MultiGarmentLayeringPage() {
                       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                     </svg>
                   </div>
-                  <span className="stu-light-label">Evening<br />Gala</span>
+                  <span className="stu-light-label" style={{ whiteSpace: "pre-line" }}>{t.eveningGala}</span>
                 </button>
               </div>
             </div>
@@ -428,7 +545,7 @@ export default function MultiGarmentLayeringPage() {
                 <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
                 <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
               </svg>
-              <span>Drag to rotate 360°</span>
+              <span>{t.dragRotate}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
@@ -443,13 +560,13 @@ export default function MultiGarmentLayeringPage() {
                 <circle cx="12" cy="5" r="2" />
                 <path d="m14 7 8 8-2 2-6-6-6 6-2-2 8-8" />
               </svg>
-              <h2 className="lay-panel-title">Complete Outfit</h2>
+              <h2 className="lay-panel-title">{t.completeOutfit}</h2>
             </div>
 
             {/* Price Display */}
             <div className="lay-price-row">
               <span className="lay-total-price">$1,840.00</span>
-              <span className="lay-discount-badge">4 items &bull; Save 12%</span>
+              <span className="lay-discount-badge">{t.saveBadge}</span>
             </div>
 
             {/* AI Style Compatibility Score Card */}
@@ -460,10 +577,10 @@ export default function MultiGarmentLayeringPage() {
                 </svg>
               </div>
               <div className="lay-ai-content">
-                <span className="lay-ai-title">AI Style Compatibility Score</span>
+                <span className="lay-ai-title">{t.aiScoreTitle}</span>
                 <div className="lay-ai-score-row">
                   <span className="lay-ai-score">9.8/10</span>
-                  <span className="lay-ai-sub">Timeless navy &amp; off-white chromatic harmony.</span>
+                  <span className="lay-ai-sub">{t.aiScoreSub}</span>
                 </div>
               </div>
             </div>
@@ -478,9 +595,9 @@ export default function MultiGarmentLayeringPage() {
                     </svg>
                   )}
                 </div>
-                <span>Select All for Cart</span>
+                <span>{t.selectAll}</span>
               </label>
-              <span className="lay-selected-count">{selectedCount} items selected</span>
+              <span className="lay-selected-count">{selectedCount} {t.itemsSelected}</span>
             </div>
 
             {/* Checklist 4 Items */}
@@ -495,7 +612,7 @@ export default function MultiGarmentLayeringPage() {
                     <div className="lay-check-thumb-wrap">
                       <Image
                         src={item.cartThumb}
-                        alt={item.name}
+                        alt={lang === "FR" ? item.nameFr : item.name}
                         width={36}
                         height={38}
                         className="lay-check-thumb"
@@ -503,7 +620,7 @@ export default function MultiGarmentLayeringPage() {
                     </div>
                     <div className="lay-check-info">
                       <span className="lay-check-brand">{item.brand}</span>
-                      <span className="lay-check-name">{item.name}</span>
+                      <span className="lay-check-name">{lang === "FR" ? item.nameFr : item.name}</span>
                       <span className="lay-check-price">{item.priceStr}</span>
                     </div>
                   </div>
@@ -529,7 +646,7 @@ export default function MultiGarmentLayeringPage() {
                   <path d="M4 17h16" />
                 </svg>
                 <span>
-                  Swap Shoes <span>({shoesType === "pumps" ? "Sneakers vs Pumps" : "Pumps vs Sneakers"})</span>
+                  {t.swapShoes} <span>({shoesType === "pumps" ? t.pumpsVsSneakers : t.sneakersVsPumps})</span>
                 </span>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -548,7 +665,7 @@ export default function MultiGarmentLayeringPage() {
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span>Add Complete Outfit to Cart</span>
+              <span>{t.addCompleteOutfit}</span>
             </button>
           </aside>
         </div>

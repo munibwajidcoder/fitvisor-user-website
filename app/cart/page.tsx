@@ -1,11 +1,108 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 
 export default function CartPage() {
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const translations = {
+    EN: {
+      navHome: "Home",
+      navCatalog: "Catalog",
+      navStudio: "3D Studio",
+      navWardrobe: "Wardrobe",
+      navPricing: "Plans",
+      searchPlaceholder: "Search brands, styles, or items...",
+      cartTitle: "Cart",
+      profileTitle: "User Profile",
+      cartHeading: "Shopping Cart",
+      cartSubtitle: "Review your selected luxury items, sizes, and try-on details.",
+      clearCart: "Clear Cart",
+      restoreCart: "Restore Cart Item",
+      emptyHeading: "Your shopping cart is empty",
+      emptySub: "Add items from your virtual styling session to continue.",
+      productTitle: "Balmain Structured Blazer",
+      sizeLabel: "Size: M",
+      colorLabel: "Navy Blue",
+      guaranteeTitle: "FitVisor Guarantee:",
+      guaranteeSub: "Verified on your 3D avatar (Zero-return guarantee)",
+      chooseDelivery: "Choose Delivery Option",
+      expressDelivery: "Express Home Delivery",
+      expressSub: "(24-48h)",
+      boutiqueDelivery: "Reserve Free in Local Boutique",
+      boutiqueSub: "(Downtown Boutique — Ready in 2 hours for physical try-on)",
+      orderSummary: "Order Summary",
+      subtotal: "Subtotal",
+      capsulePromo: "Capsule Promo",
+      shipping: "Shipping",
+      free: "Free",
+      estimatedTax: "Estimated Tax",
+      included: "Included",
+      total: "Total",
+      promoPlaceholder: "Enter promo or capsule code",
+      proceedCheckout: "Proceed to Secure Checkout",
+      sslSecured: "256-Bit SSL Secured",
+      pciCompliant: "PCI-DSS Compliant",
+    },
+    FR: {
+      navHome: "Accueil",
+      navCatalog: "Catalogue",
+      navStudio: "Studio 3D",
+      navWardrobe: "Garde-robe",
+      navPricing: "Tarifs",
+      searchPlaceholder: "Rechercher des marques, styles...",
+      cartTitle: "Panier",
+      profileTitle: "Profil utilisateur",
+      cartHeading: "Panier d'achat",
+      cartSubtitle: "Vérifiez vos articles de luxe sélectionnés, tailles et détails d'essayage.",
+      clearCart: "Vider le panier",
+      restoreCart: "Restaurer l'article",
+      emptyHeading: "Votre panier d'achat est vide",
+      emptySub: "Ajoutez des articles de votre séance de style virtuel pour continuer.",
+      productTitle: "Blazer Structuré Balmain",
+      sizeLabel: "Taille : M",
+      colorLabel: "Bleu marine",
+      guaranteeTitle: "Garantie FitVisor :",
+      guaranteeSub: "Vérifié sur votre avatar 3D (Garantie zéro retour)",
+      chooseDelivery: "Choisir le mode de livraison",
+      expressDelivery: "Livraison Express à Domicile",
+      expressSub: "(24-48h)",
+      boutiqueDelivery: "Réservation Gratuite en Boutique",
+      boutiqueSub: "(Boutique Centre-ville — Prêt en 2h pour essayage physique)",
+      orderSummary: "Résumé de la commande",
+      subtotal: "Sous-total",
+      capsulePromo: "Promo Capsule",
+      shipping: "Livraison",
+      free: "Gratuit",
+      estimatedTax: "Taxe estimée",
+      included: "Incluse",
+      total: "Total",
+      promoPlaceholder: "Entrez un code promo ou capsule",
+      proceedCheckout: "Passer à la caisse sécurisée",
+      sslSecured: "Sécurisé SSL 256-Bit",
+      pciCompliant: "Conforme PCI-DSS",
+    },
+  };
+
+  const t = translations[lang];
+
   const [quantity, setQuantity] = useState<number>(1);
   const [isChecked, setIsChecked] = useState<boolean>(true);
   const [deliveryOption, setDeliveryOption] = useState<"express" | "boutique">("express");
@@ -42,44 +139,67 @@ export default function CartPage() {
   return (
     <div className="cart-page-wrapper">
       <div className="cart-container">
-        {/* ================= HEADER / NAVBAR ================= */}
+        {/* ================= UNIVERSAL HEADER / NAVBAR ================= */}
         <header className="cat-navbar" style={{ marginBottom: "26px" }}>
+          {/* Brand Logo - Row 1 Left */}
           <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
           <nav className="cat-nav-menu">
             <Link href="/" className="cat-nav-item">
-              Home
+              {t.navHome}
             </Link>
             <Link href="/catalog" className="cat-nav-item">
-              Catalog
+              {t.navCatalog}
             </Link>
             <Link href="/3d-studio" className="cat-nav-item">
-              3D Studio
+              {t.navStudio}
             </Link>
             <Link href="/wardrobe" className="cat-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="/community" className="cat-nav-item">
-              Community
+              {t.navWardrobe}
             </Link>
           </nav>
 
+          {/* Search Bar - Desktop Right / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
           <div className="cat-nav-actions">
-            <div className="cat-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                className="cat-search-input"
-              />
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="cart-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="cart-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <Link href="/cart" className="cat-cart-btn" title="Cart" style={{ textDecoration: "none" }}>
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn active" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
@@ -88,7 +208,8 @@ export default function CartPage() {
               <span className="cat-cart-badge">{isCartCleared ? 0 : quantity}</span>
             </Link>
 
-            <div className="cat-user-avatar-wrap" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            {/* User Profile Avatar */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
@@ -96,10 +217,7 @@ export default function CartPage() {
                 height={32}
                 className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
+            </Link>
           </div>
         </header>
 
@@ -117,8 +235,8 @@ export default function CartPage() {
                   </svg>
                 </div>
                 <div className="cart-title-text-group">
-                  <h1 className="cart-heading">Shopping Cart</h1>
-                  <p className="cart-subtitle">Review your items and choose your preferred delivery option.</p>
+                  <h1 className="cart-heading">{t.cartHeading}</h1>
+                  <p className="cart-subtitle">{t.cartSubtitle}</p>
                 </div>
               </div>
 
@@ -133,7 +251,7 @@ export default function CartPage() {
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                   </svg>
-                  <span>Clear Cart</span>
+                  <span>{t.clearCart}</span>
                 </button>
               )}
             </div>
@@ -160,7 +278,7 @@ export default function CartPage() {
 
                   <Image
                     src="/images/cart/balmain_suit_card.png"
-                    alt="Balmain Structured Blazer"
+                    alt={t.productTitle}
                     width={145}
                     height={200}
                     className="cart-item-img"
@@ -200,7 +318,7 @@ export default function CartPage() {
 
                   {/* Product Title */}
                   <Link href="/product" style={{ textDecoration: "none" }}>
-                    <h2 className="cart-product-title">Balmain Structured Blazer</h2>
+                    <h2 className="cart-product-title">{t.productTitle}</h2>
                   </Link>
 
                   {/* Meta row: Size & Color */}
@@ -210,18 +328,18 @@ export default function CartPage() {
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
                         <line x1="7" y1="7" x2="7.01" y2="7"></line>
                       </svg>
-                      <span>Size: M</span>
+                      <span>{t.sizeLabel}</span>
                     </div>
                     <span>•</span>
                     <div className="cart-meta-item">
                       <span className="cart-color-dot"></span>
-                      <span>Navy Blue</span>
+                      <span>{t.colorLabel}</span>
                     </div>
                   </div>
 
                   {/* Price */}
                   <div className="cart-price-tag">
-                    ${subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${subtotal.toLocaleString(lang === "FR" ? "fr-FR" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
 
                   {/* FitVisor Guarantee Banner */}
@@ -232,8 +350,8 @@ export default function CartPage() {
                       </svg>
                     </div>
                     <div>
-                      <span className="cart-guarantee-text">FitVisor Guarantee:</span>
-                      <span className="cart-guarantee-sub">Verified on your 3D avatar (Zero-return guarantee)</span>
+                      <span className="cart-guarantee-text">{t.guaranteeTitle}</span>
+                      <span className="cart-guarantee-sub">{t.guaranteeSub}</span>
                     </div>
                   </div>
 
@@ -246,7 +364,7 @@ export default function CartPage() {
                         <circle cx="5.5" cy="18.5" r="2.5"></circle>
                         <circle cx="18.5" cy="18.5" r="2.5"></circle>
                       </svg>
-                      <span>Choose Delivery Option</span>
+                      <span>{t.chooseDelivery}</span>
                     </div>
 
                     <div className="cart-delivery-cards">
@@ -273,9 +391,9 @@ export default function CartPage() {
                               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                               <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
-                            <span>Express Home Delivery</span>
+                            <span>{t.expressDelivery}</span>
                           </div>
-                          <span className="cart-delivery-subtitle">(24-48h)</span>
+                          <span className="cart-delivery-subtitle">{t.expressSub}</span>
                         </div>
                       </div>
 
@@ -304,10 +422,10 @@ export default function CartPage() {
                               <path d="M9 11v4"></path>
                               <path d="M15 11v4"></path>
                             </svg>
-                            <span>Reserve Free in Local Boutique</span>
+                            <span>{t.boutiqueDelivery}</span>
                           </div>
                           <span className="cart-delivery-subtitle">
-                            (Downtown Boutique — Ready in 2 hours for physical try-on)
+                            {t.boutiqueSub}
                           </span>
                         </div>
                       </div>
@@ -321,15 +439,15 @@ export default function CartPage() {
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                   <line x1="3" y1="6" x2="21" y2="6"></line>
                 </svg>
-                <h3 style={{ fontSize: "16px", color: "#0f224a", marginBottom: "8px" }}>Your shopping cart is empty</h3>
-                <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "16px" }}>Add items from your virtual styling session to continue.</p>
+                <h3 style={{ fontSize: "16px", color: "#0f224a", marginBottom: "8px" }}>{t.emptyHeading}</h3>
+                <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "16px" }}>{t.emptySub}</p>
                 <button
                   type="button"
                   onClick={handleRestoreCart}
                   className="cart-checkout-btn"
                   style={{ display: "inline-flex", padding: "10px 20px" }}
                 >
-                  Restore Cart Item
+                  {t.restoreCart}
                 </button>
               </div>
             )}
@@ -345,42 +463,42 @@ export default function CartPage() {
                 <line x1="16" y1="17" x2="8" y2="17"></line>
                 <polyline points="10 9 9 9 8 9"></polyline>
               </svg>
-              <span>Order Summary</span>
+              <span>{t.orderSummary}</span>
             </h2>
 
             <div className="cart-summary-lines">
               <div className="cart-summary-line">
-                <span className="cart-line-label">Subtotal</span>
+                <span className="cart-line-label">{t.subtotal}</span>
                 <span className="cart-line-val">
-                  ${subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ${subtotal.toLocaleString(lang === "FR" ? "fr-FR" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
 
               {discountPercent > 0 && (
                 <div className="cart-summary-line">
-                  <span className="cart-line-label">Capsule Promo ({discountPercent}%)</span>
+                  <span className="cart-line-label">{t.capsulePromo} ({discountPercent}%)</span>
                   <span className="cart-line-val green">
-                    -${discountAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    -${discountAmount.toLocaleString(lang === "FR" ? "fr-FR" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               )}
 
               <div className="cart-summary-line">
-                <span className="cart-line-label">Shipping</span>
-                <span className="cart-line-val green">Free</span>
+                <span className="cart-line-label">{t.shipping}</span>
+                <span className="cart-line-val green">{t.free}</span>
               </div>
 
               <div className="cart-summary-line">
-                <span className="cart-line-label">Estimated Tax</span>
-                <span className="cart-line-val muted">Included</span>
+                <span className="cart-line-label">{t.estimatedTax}</span>
+                <span className="cart-line-val muted">{t.included}</span>
               </div>
 
               <div className="cart-summary-divider"></div>
 
               <div className="cart-total-row">
-                <span className="cart-total-label">Total</span>
+                <span className="cart-total-label">{t.total}</span>
                 <span className="cart-total-amount">
-                  ${finalTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ${finalTotal.toLocaleString(lang === "FR" ? "fr-FR" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
@@ -394,7 +512,7 @@ export default function CartPage() {
                 </svg>
                 <input
                   type="text"
-                  placeholder="Enter promo or capsule code"
+                  placeholder={t.promoPlaceholder}
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
@@ -426,7 +544,7 @@ export default function CartPage() {
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              <span>Proceed to Secure Checkout</span>
+              <span>{t.proceedCheckout}</span>
               <span style={{ marginLeft: "4px" }}>→</span>
             </Link>
 
@@ -437,14 +555,14 @@ export default function CartPage() {
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                   <polyline points="9 12 11 14 15 10"></polyline>
                 </svg>
-                <span>256-Bit SSL Secured</span>
+                <span>{t.sslSecured}</span>
               </div>
               <div className="cart-trust-item">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="cart-trust-icon">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                   <polyline points="9 12 11 14 15 10"></polyline>
                 </svg>
-                <span>PCI-DSS Compliant</span>
+                <span>{t.pciCompliant}</span>
               </div>
             </div>
           </aside>

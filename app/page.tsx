@@ -1,17 +1,96 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 
+const translations = {
+  EN: {
+    navHome: "Home",
+    navCatalog: "Catalog",
+    navStudio: "3D Studio",
+    navWardrobe: "Wardrobe",
+    navPricing: "Plans",
+    navCommunity: "Community",
+    searchPlaceholder: "Search brands, styles, or items...",
+    cartTitle: "Cart / Try-On Bag",
+    profileTitle: "My Profile & Biometric Vault",
+    heroTag: "CURATED FOR YOUR UNIQUE SHAPE",
+    heroTitle: "Autumn Capsule: 15 Tailored Blazers\nMatched to Your Body Profile",
+    heroSub: "Premium brands • Perfect fits • Your style, your way",
+    heroCta: "Try Selection on My Avatar",
+    metricSynced: "Measurements Synced:",
+    metricSyncedDate: "Oct 20, 2026",
+    metricOutfits: "Saved Outfits",
+    metricFitMatch: "Average Try-On Fit Match:",
+    recTitle: "Recommended for You",
+    recSub: "(Guaranteed Size M with 0% Return Risk)",
+    viewAll: "View All",
+    tryOnAction: "Try-On on My Avatar",
+    commTitle: "Community Style Feed Highlights",
+    commSub: "Real people. Real styles. Real fits.",
+    boutTitle: "Partner Boutiques Near You",
+    boutSub: "Book a fitting, try in-store, or pick up your order.",
+    reserve: "Reserve",
+    booked: "Booked ✓",
+  },
+  FR: {
+    navHome: "Accueil",
+    navCatalog: "Catalogue",
+    navStudio: "Studio 3D",
+    navWardrobe: "Garde-robe",
+    navPricing: "Tarifs",
+    navCommunity: "Communauté",
+    searchPlaceholder: "Rechercher des marques, styles...",
+    cartTitle: "Panier / Sac d'essayage",
+    profileTitle: "Mon profil & Coffre biométrique",
+    heroTag: "SÉLECTIONNÉ POUR VOTRE MORPHOLOGIE UNIQUE",
+    heroTitle: "Capsule d'Automne : 15 Blazers ajustés\nà votre profil morphologique",
+    heroSub: "Marques haut de gamme • Coupes parfaites • Votre style, à votre façon",
+    heroCta: "Essayer sur mon avatar",
+    metricSynced: "Mesures synchronisées :",
+    metricSyncedDate: "20 oct. 2026",
+    metricOutfits: "Tenues enregistrées",
+    metricFitMatch: "Précision moyenne d'essayage :",
+    recTitle: "Recommandé pour vous",
+    recSub: "(Taille M garantie avec 0% risque de retour)",
+    viewAll: "Voir tout",
+    tryOnAction: "Essayer sur mon avatar",
+    commTitle: "Tendances de la communauté",
+    commSub: "De vraies personnes. De vrais styles. De vraies coupes.",
+    boutTitle: "Boutiques partenaires à proximité",
+    boutSub: "Réservez un essayage, essayez en magasin ou retirez votre commande.",
+    reserve: "Réserver",
+    booked: "Réservé ✓",
+  },
+};
+
 export default function HomePage() {
   const router = useRouter();
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(1);
   const [likedPosts, setLikedPosts] = useState<Record<number, boolean>>({});
   const [reservedBoutique, setReservedBoutique] = useState<number | null>(null);
+
+  // Load language preference from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const t = translations[lang];
 
   const toggleLike = (id: number) => {
     setLikedPosts((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -32,132 +111,138 @@ export default function HomePage() {
     setReservedBoutique(reservedBoutique === id ? null : id);
   };
 
-  // 1. Recommended Products (Blazers)
+  // 1. Recommended Products (Blazers) - Full Bilingual Translations
   const products = [
     {
       id: 1,
       brand: "zalando",
       brandType: "zalando",
-      title: "Oversized Blazer",
-      category: "Zalando • Women",
+      title: lang === "FR" ? "Blazer oversize" : "Oversized Blazer",
+      category: lang === "FR" ? "Zalando • Femmes" : "Zalando • Women",
       price: "$129.00",
-      fitMatch: "98% Fit Match",
+      fitMatch: lang === "FR" ? "98% Correspondance" : "98% Fit Match",
       img: "/images/home/product_blazer_1.png",
     },
     {
       id: 2,
       brand: "H&M",
       brandType: "hm",
-      title: "Tailored Blazer",
-      category: "H&M • Women",
+      title: lang === "FR" ? "Blazer ajusté" : "Tailored Blazer",
+      category: lang === "FR" ? "H&M • Femmes" : "H&M • Women",
       price: "$99.99",
-      fitMatch: "98% Fit Match",
+      fitMatch: lang === "FR" ? "98% Correspondance" : "98% Fit Match",
       img: "/images/home/product_blazer_2.png",
     },
     {
       id: 3,
       brand: "sandro",
       brandType: "sandro",
-      title: "Wool Blend Blazer",
-      category: "Sandro • Women",
+      title: lang === "FR" ? "Blazer en laine mélangée" : "Wool Blend Blazer",
+      category: lang === "FR" ? "Sandro • Femmes" : "Sandro • Women",
       price: "$245.00",
-      fitMatch: "96% Fit Match",
+      fitMatch: lang === "FR" ? "96% Correspondance" : "96% Fit Match",
       img: "/images/home/product_blazer_3.png",
     },
     {
       id: 4,
       brand: "zalando",
       brandType: "zalando",
-      title: "Relaxed Blazer",
-      category: "Zalando • Men",
+      title: lang === "FR" ? "Blazer décontracté" : "Relaxed Blazer",
+      category: lang === "FR" ? "Zalando • Hommes" : "Zalando • Men",
       price: "$139.00",
-      fitMatch: "95% Fit Match",
+      fitMatch: lang === "FR" ? "95% Correspondance" : "95% Fit Match",
       img: "/images/home/product_blazer_4.png",
     },
     {
       id: 5,
       brand: "H&M",
       brandType: "hm",
-      title: "Linen Blazer",
-      category: "H&M • Women",
+      title: lang === "FR" ? "Blazer en lin" : "Linen Blazer",
+      category: lang === "FR" ? "H&M • Femmes" : "H&M • Women",
       price: "$89.99",
-      fitMatch: "98% Fit Match",
+      fitMatch: lang === "FR" ? "98% Correspondance" : "98% Fit Match",
       img: "/images/home/product_blazer_5.png",
     },
     {
       id: 6,
       brand: "sandro",
       brandType: "sandro",
-      title: "Double-Breasted Blazer",
-      category: "Sandro • Women",
+      title: lang === "FR" ? "Blazer croisé" : "Double-Breasted Blazer",
+      category: lang === "FR" ? "Sandro • Femmes" : "Sandro • Women",
       price: "$295.00",
-      fitMatch: "98% Fit Match",
+      fitMatch: lang === "FR" ? "98% Correspondance" : "98% Fit Match",
       img: "/images/home/product_blazer_6.png",
     },
   ];
 
-  // 2. Community Style Feed
+  // 2. Community Style Feed - Correct Image Paths & Translations
   const communityPosts = [
     {
       id: 1,
-      user: "@alex.style",
-      fitMatch: "96% Fit Match",
+      user: "@sarah_fit",
+      fitMatch: lang === "FR" ? "98% Correspondance" : "98% Match",
+      likes: 243,
+      verified: true,
+      badge: lang === "FR" ? "Sablier • Taille M" : "Hourglass • Size M",
       img: "/images/home/community_1.png",
     },
     {
       id: 2,
-      user: "@sophia.wears",
-      fitMatch: "96% Fit Match",
+      user: "@marcus_style",
+      fitMatch: lang === "FR" ? "96% Correspondance" : "96% Match",
+      likes: 189,
+      verified: true,
+      badge: lang === "FR" ? "Athlétique • Taille L" : "Athletic • Size L",
       img: "/images/home/community_2.png",
     },
     {
       id: 3,
-      user: "@daniel.trends",
-      fitMatch: "97% Fit Match",
+      user: "@elena_couture",
+      fitMatch: lang === "FR" ? "99% Correspondance" : "99% Match",
+      likes: 412,
+      verified: true,
+      badge: lang === "FR" ? "Petite • Taille S" : "Petite • Size S",
       img: "/images/home/community_3.png",
     },
     {
       id: 4,
-      user: "@fiona.fashion",
-      fitMatch: "95% Fit Match",
+      user: "@chloe_mode",
+      fitMatch: lang === "FR" ? "97% Correspondance" : "97% Match",
+      likes: 315,
+      verified: true,
+      badge: lang === "FR" ? "Grande • Taille M" : "Tall • Size M",
       img: "/images/home/community_4.png",
-    },
-    {
-      id: 5,
-      user: "@miko.looks",
-      fitMatch: "96% Fit Match",
-      img: "/images/home/community_5.png",
     },
   ];
 
-  // 3. Partner Boutiques
+  // 3. Partner Boutiques - Translations
   const boutiques = [
     {
       id: 1,
-      name: "Zalando Lounge",
-      location: "Mall of Lahore • 2.6 km",
-      badge: "In-Store & Pickup",
-      img: "/images/home/boutique_zalando.png",
-    },
-    {
-      id: 2,
-      name: "H&M",
-      location: "Emporium Mall • 3.1 km",
-      badge: "In-Store Fitting",
-      img: "/images/home/boutique_hm.png",
-    },
-    {
-      id: 3,
-      name: "Sandro",
-      location: "Dolmen Mall • 4.8 km",
-      badge: "In-Store Fitting",
+      name: "Sandro Marais",
+      location: "Rue Vieille du Temple, Paris",
+      badge: lang === "FR" ? "En magasin & Retrait 1h" : "In-Store & 1h Pickup",
       img: "/images/home/boutique_sandro.png",
     },
     {
+      id: 2,
+      name: "Zalando Lounge",
+      location: "Gutenbergstraße, Berlin",
+      badge: lang === "FR" ? "Cabine d'essayage express" : "Instant Fitting Room",
+      img: "/images/home/boutique_zalando.png",
+    },
+    {
+      id: 3,
+      name: "H&M Flagship",
+      location: "Regent Street, London",
+      badge: lang === "FR" ? "En magasin & Retrait" : "In-Store & Pickup",
+      img: "/images/home/boutique_hm.png",
+    },
+    {
       id: 4,
-      name: "Zara",
-      location: "Liberty Market • 5.6 km",
-      badge: "In-Store & Pickup",
+      name: "Zara Haussmann",
+      location: "Bd Haussmann, Paris",
+      badge: lang === "FR" ? "En magasin & Retrait" : "In-Store & Pickup",
       img: "/images/home/boutique_zara.png",
     },
   ];
@@ -169,52 +254,70 @@ export default function HomePage() {
             HEADER / NAVIGATION
             ========================================================= */}
         <header className="fv-navbar">
-          {/* Brand Logo */}
+          {/* Brand Logo - Top Left */}
           <div className="fv-nav-brand">
             <Logo size="md" />
           </div>
 
-          {/* Nav Links */}
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
           <nav className="fv-nav-menu">
             <Link href="/" className="fv-nav-item active">
-              Home
+              {t.navHome}
             </Link>
             <Link href="/catalog" className="fv-nav-item">
-              Catalog
+              {t.navCatalog}
             </Link>
             <Link href="/3d-studio" className="fv-nav-item">
-              3D Studio
+              {t.navStudio}
             </Link>
             <Link href="/wardrobe" className="fv-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="/community" className="fv-nav-item">
-              Community
+              {t.navWardrobe}
             </Link>
           </nav>
 
-          {/* Right Action Bar */}
+          {/* Search Form - Right (Desktop) / Row 2 Full-Width (Mobile) */}
+          <form onSubmit={handleSearchSubmit} className="fv-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="fv-search-icon">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="fv-search-input"
+            />
+          </form>
+
+          {/* Top Right Actions Cluster: Language Switch, Cart, Profile */}
           <div className="fv-nav-actions">
-            {/* Search Input Form */}
-            <form onSubmit={handleSearchSubmit} className="fv-search-pill" style={{ display: "flex", alignItems: "center" }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="fv-search-icon">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="fv-search-input"
-              />
-            </form>
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="home-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="home-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
+            </div>
 
             {/* Shopping Cart Link */}
             <Link
               href="/cart"
               className="fv-cart-btn"
-              title="Cart / Try-On Bag"
+              title={t.cartTitle}
               style={{ textDecoration: "none" }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -226,7 +329,7 @@ export default function HomePage() {
             </Link>
 
             {/* User Profile Avatar */}
-            <Link href="/profile" className="fv-user-avatar-wrap" title="My Profile & Biometric Vault">
+            <Link href="/profile" className="fv-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
@@ -244,19 +347,19 @@ export default function HomePage() {
         <section className="fv-hero-banner">
           {/* Left Text Column */}
           <div className="fv-hero-left">
-            <span className="fv-hero-tag">CURATED FOR YOUR UNIQUE SHAPE</span>
-            <h1 className="fv-hero-title">
-              Autumn Capsule: 15 Tailored Blazers<br />Matched to Your Body Profile
+            <span className="fv-hero-tag">{t.heroTag}</span>
+            <h1 className="fv-hero-title" style={{ whiteSpace: "pre-line" }}>
+              {t.heroTitle}
             </h1>
             <p className="fv-hero-sub">
-              Premium brands &bull; Perfect fits &bull; Your style, your way
+              {t.heroSub}
             </p>
             <Link href="/3d-studio" className="fv-hero-cta">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M16 7a4 4 0 0 0-8 0v1" />
                 <path d="M2 17l10-8 10 8H2z" />
               </svg>
-              <span>Try Selection on My Avatar</span>
+              <span>{t.heroCta}</span>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -290,8 +393,8 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="fv-metric-text">
-                <span className="fv-metric-sub">Measurements Synced:</span>
-                <span className="fv-metric-main">Oct 20, 2026</span>
+                <span className="fv-metric-sub">{t.metricSynced}</span>
+                <span className="fv-metric-main">{t.metricSyncedDate}</span>
               </div>
             </div>
           </Link>
@@ -307,7 +410,7 @@ export default function HomePage() {
               </div>
               <div className="fv-metric-text">
                 <span className="fv-metric-bold-lead">3</span>
-                <span className="fv-metric-sub-inline">Saved Outfits</span>
+                <span className="fv-metric-sub-inline">{t.metricOutfits}</span>
               </div>
             </div>
           </Link>
@@ -321,7 +424,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="fv-metric-text">
-                <span className="fv-metric-sub">Average Try-On Fit Match:</span>
+                <span className="fv-metric-sub">{t.metricFitMatch}</span>
                 <span className="fv-metric-main">96%</span>
               </div>
             </div>
@@ -334,13 +437,13 @@ export default function HomePage() {
         <section className="fv-section" id="catalog">
           <div className="fv-section-header">
             <div className="fv-section-title-wrap">
-              <h2 className="fv-section-title">Recommended for You</h2>
+              <h2 className="fv-section-title">{t.recTitle}</h2>
               <span className="fv-section-pill-tag">
-                (Guaranteed Size M with 0% Return Risk)
+                {t.recSub}
               </span>
             </div>
             <Link href="/catalog" className="fv-view-all-link">
-              <span>View All</span>
+              <span>{t.viewAll}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -404,7 +507,7 @@ export default function HomePage() {
                         type="button"
                         className="fv-prod-action-btn"
                         onClick={handleAddToCart}
-                        title="Try-On on My Avatar"
+                        title={t.tryOnAction}
                       >
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M16 7a4 4 0 0 0-8 0v1" />
@@ -431,11 +534,11 @@ export default function HomePage() {
         <section className="fv-section" id="community">
           <div className="fv-section-header">
             <div>
-              <h2 className="fv-section-title">Community Style Feed Highlights</h2>
-              <p className="fv-section-sub">Real people. Real styles. Real fits.</p>
+              <h2 className="fv-section-title">{t.commTitle}</h2>
+              <p className="fv-section-sub">{t.commSub}</p>
             </div>
             <Link href="#view-all-community" className="fv-view-all-link">
-              <span>View All</span>
+              <span>{t.viewAll}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -452,31 +555,48 @@ export default function HomePage() {
 
             <div className="fv-community-grid">
               {communityPosts.map((post) => {
-                const isLiked = !!likedPosts[post.id];
+                const isLiked = likedPosts[post.id] ?? false;
                 return (
-                  <div key={post.id} className="fv-community-card">
-                    <Image
-                      src={post.img}
-                      alt={`Style by ${post.user}`}
-                      width={220}
-                      height={140}
-                      className="fv-comm-img"
-                    />
+                  <div key={post.id} className="fv-comm-card">
+                    {/* Visual Photo Card */}
+                    <div className="fv-comm-img-wrap">
+                      <Image
+                        src={post.img}
+                        alt={`Look by ${post.user}`}
+                        width={260}
+                        height={340}
+                        className="fv-comm-img"
+                      />
+                    </div>
 
-                    {/* Top Heart Icon */}
-                    <button
-                      type="button"
-                      className={`fv-heart-btn ${isLiked ? "liked" : ""}`}
-                      onClick={() => toggleLike(post.id)}
-                      title="Favorite"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill={isLiked ? "#ef4444" : "#ffffff"} stroke={isLiked ? "#ef4444" : "rgba(0,0,0,0.15)"} strokeWidth="1.5">
-                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                      </svg>
-                    </button>
+                    {/* Top Row: Tag badge + Floating Like Button */}
+                    <div className="fv-comm-top-row">
+                      <span className="fv-comm-badge">{post.badge}</span>
 
-                    {/* Bottom Frosted Pill Overlay */}
-                    <div className="fv-comm-overlay">
+                      <button
+                        type="button"
+                        className={`fv-comm-like-btn ${isLiked ? "liked" : ""}`}
+                        onClick={() => toggleLike(post.id)}
+                        aria-label="Like this look"
+                      >
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill={isLiked ? "#f04b55" : "none"}
+                          stroke={isLiked ? "#f04b55" : "#ffffff"}
+                          strokeWidth="2.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                        </svg>
+                        <span>{isLiked ? post.likes + 1 : post.likes}</span>
+                      </button>
+                    </div>
+
+                    {/* Bottom Metadata Footer: User Avatar + Fit Match */}
+                    <div className="fv-comm-meta">
                       <div className="fv-comm-user">
                         <div className="fv-comm-mini-avatar" />
                         <span className="fv-comm-username">{post.user}</span>
@@ -502,11 +622,11 @@ export default function HomePage() {
         <section className="fv-section" id="boutiques">
           <div className="fv-section-header">
             <div>
-              <h2 className="fv-section-title">Partner Boutiques Near You</h2>
-              <p className="fv-section-sub">Book a fitting, try in-store, or pick up your order.</p>
+              <h2 className="fv-section-title">{t.boutTitle}</h2>
+              <p className="fv-section-sub">{t.boutSub}</p>
             </div>
             <Link href="#view-all-boutiques" className="fv-view-all-link">
-              <span>View All</span>
+              <span>{t.viewAll}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -551,7 +671,7 @@ export default function HomePage() {
                         className={`fv-boutique-btn ${isReserved ? "reserved" : ""}`}
                         onClick={() => handleReserve(b.id)}
                       >
-                        {isReserved ? "Booked ✓" : "Reserve"}
+                        {isReserved ? t.booked : t.reserve}
                       </button>
                     </div>
                   </div>

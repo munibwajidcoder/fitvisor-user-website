@@ -99,11 +99,6 @@ export default function WelcomeFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/community" className="wft-link">
-                  Verified Style Community
-                </Link>
-              </li>
-              <li>
                 <Link href="/pricing" className="wft-link">
                   Membership Plans (Free &bull; Pro)
                 </Link>

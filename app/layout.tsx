@@ -19,6 +19,16 @@ export const metadata: Metadata = {
   title: "FitVisor - Virtual Try-On with True Precision",
   description:
     "Your ultra-realistic 3D digital twin, generated from just 3 photos. Say goodbye to 70% of online returns.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/favicon.png" },
+    ],
+    shortcut: ["/favicon.ico"],
+  },
 };
 
 export default function RootLayout({
@@ -29,6 +39,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
         {/* Synchronous script to strip extension-injected attributes (Bitdefender, Urban VPN, Grammarly, etc.) before React hydrates */}
         <script
           dangerouslySetInnerHTML={{

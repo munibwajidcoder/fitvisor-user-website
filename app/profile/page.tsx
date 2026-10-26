@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,127 @@ import Logo from "@/components/Logo";
 
 export default function ProfilePage() {
   const router = useRouter();
+
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const translations = {
+    EN: {
+      navHome: "Home",
+      navCatalog: "Catalog",
+      navStudio: "3D Studio",
+      navWardrobe: "Wardrobe",
+      navPricing: "Plans",
+      searchPlaceholder: "Search brands, styles, or items...",
+      cartTitle: "Cart",
+      profileTitle: "User Profile",
+      proMember: "Pro Member",
+      lastScan: "Last 3D Scan: Oct 20, 2026",
+      qualityScore: "Quality Score 98%",
+      recalibrate: "Recalibrate My 3D Avatar",
+      stylePrefTitle: "Style Preferences",
+      stylePrefSub: "Your style, fit and appearance preferences",
+      stockAlertsTitle: "Stock & Size Alerts",
+      stockAlertsSub: "Get notified when your size or favorite items are back",
+      invoiceHistoryTitle: "Payment & Invoice History",
+      invoiceHistorySub: "View your transactions and download invoices",
+      subscriptionPlanTitle: "Subscription & VIP Plans",
+      subscriptionPlanSub: "Manage boutique tier, unlock unlimited 3D scans & early drops",
+      viewPlans: "View Plans",
+      vaultTitle: "Privacy & Biometric Data Vault",
+      vaultSub: "Your data, your control. We follow full GDPR compliance and keep your biometric information safe and private.",
+      anonymousTitle: "Anonymous Mode",
+      anonymousSub: "Blur your face in community style feed to stay private.",
+      anonymousToggleSub: "Blur face in community style feed",
+      dataRightsTitle: "Data Rights Actions",
+      gdprNotice: "Full GDPR compliance",
+      exportDataTitle: "Export All Biometric Data",
+      exportDataSub: "Download JSON & 3D OBJ Mesh",
+      deleteAccountTitle: "Delete Account & Data",
+      deleteAccountSub: "Permanently erase biometric profile and models",
+      manageConsentsTitle: "Manage AI Processing Consents",
+      manageConsentsSub: "Control how your data is used for AI improvements",
+      manageConsentsBtn: "Manage Consents",
+      downloadBtn: "Download",
+      forgottenTitle: "Right to be Forgotten",
+      forgottenSub: "Permanently delete account and all 3D body meshes",
+      deleteBtn: "Delete Personal Data & Account",
+      aiConsentsTitle: "AI Modeling Consents",
+      aiTraining: "Allow anonymized scans to improve virtual drape precision",
+      meshFitting: "Allow real-time parametric deformation for garment fit",
+      connectedAccounts: "Connected Fashion Accounts",
+      connectedSub: "Auto-sync order sizes & preferences with luxury partner brands",
+      zalandoSync: "Zalando EU Account",
+      zalandoStatus: "Synced • Size 38 (FR/EU)",
+      hmSync: "H&M Member Club",
+      hmStatus: "Synced • Standard Fit Profile",
+    },
+    FR: {
+      navHome: "Accueil",
+      navCatalog: "Catalogue",
+      navStudio: "Studio 3D",
+      navWardrobe: "Garde-robe",
+      navPricing: "Tarifs",
+      searchPlaceholder: "Rechercher des marques, styles...",
+      cartTitle: "Panier",
+      profileTitle: "Profil utilisateur",
+      proMember: "Membre Pro",
+      lastScan: "Dernier scan 3D : 20 oct. 2026",
+      qualityScore: "Score de qualité 98%",
+      recalibrate: "Recalibrer mon avatar 3D",
+      stylePrefTitle: "Préférences de style",
+      stylePrefSub: "Vos préférences de style, coupe et silhouette",
+      stockAlertsTitle: "Alertes stock & taille",
+      stockAlertsSub: "Soyez alerté du retour de votre taille ou articles favoris",
+      invoiceHistoryTitle: "Historique des paiements & factures",
+      invoiceHistorySub: "Consultez vos transactions et téléchargez vos factures",
+      subscriptionPlanTitle: "Abonnement & Formules VIP",
+      subscriptionPlanSub: "Gérez votre statut boutique, débloquez les scans 3D illimités",
+      viewPlans: "Voir les offres",
+      vaultTitle: "Coffre de données biométriques & Confidentialité",
+      vaultSub: "Vos données, votre contrôle. Conformité totale au RGPD avec sécurisation maximale de vos données biométriques.",
+      anonymousTitle: "Mode anonyme",
+      anonymousSub: "Floutez votre visage dans le flux communautaire pour préserver votre vie privée.",
+      anonymousToggleSub: "Flouter le visage dans le flux",
+      dataRightsTitle: "Actions sur vos données personnelles",
+      gdprNotice: "Conformité totale RGPD",
+      exportDataTitle: "Exporter les données biométriques",
+      exportDataSub: "Télécharger le maillage 3D OBJ & fichier JSON",
+      deleteAccountTitle: "Supprimer le compte & données",
+      deleteAccountSub: "Effacer définitivement votre profil biométrique et modèles 3D",
+      manageConsentsTitle: "Gérer les consentements IA",
+      manageConsentsSub: "Contrôlez l'utilisation de vos données pour l'IA",
+      manageConsentsBtn: "Gérer les consentements",
+      downloadBtn: "Télécharger",
+      forgottenTitle: "Droit à l'oubli",
+      forgottenSub: "Supprimer définitivement le compte et les maillages 3D",
+      deleteBtn: "Supprimer mes données & mon compte",
+      aiConsentsTitle: "Consentements modélisation IA",
+      aiTraining: "Autoriser l'amélioration anonymisée du drapé virtuel",
+      meshFitting: "Autoriser la déformation paramétrique en temps réel",
+      connectedAccounts: "Comptes de mode connectés",
+      connectedSub: "Synchronisation automatique des tailles avec les marques partenaires",
+      zalandoSync: "Compte Zalando UE",
+      zalandoStatus: "Synchronisé • Taille 38 (FR/UE)",
+      hmSync: "Club Membre H&M",
+      hmStatus: "Synchronisé • Profil coupe standard",
+    },
+  };
+
+  const t = translations[lang];
 
   // Search input state
   const [searchQuery, setSearchQuery] = useState("");
@@ -133,67 +254,58 @@ export default function ProfilePage() {
 
           <nav className="cat-nav-menu">
             <Link href="/" className="cat-nav-item">
-              Home
+              {t.navHome}
             </Link>
             <Link href="/catalog" className="cat-nav-item">
-              Catalog
+              {t.navCatalog}
             </Link>
             <Link href="/3d-studio" className="cat-nav-item">
-              3D Studio
+              {t.navStudio}
             </Link>
             <Link href="/wardrobe" className="cat-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="/community" className="cat-nav-item">
-              Community
-            </Link>
-            <Link 
-              href="/profile" 
-              className="cat-nav-item active"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                color: "#2563eb",
-                fontWeight: 600,
-                position: "relative"
-              }}
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Profile
-              <span 
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: "2.5px",
-                  backgroundColor: "#2563eb",
-                  borderRadius: "9999px"
-                }} 
-              />
+              {t.navWardrobe}
             </Link>
           </nav>
 
-          <div className="cat-nav-actions">
-            <form onSubmit={handleSearchSubmit} className="cat-search-pill" style={{ display: "flex", alignItems: "center" }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="cat-search-input"
-              />
-            </form>
+          {/* Search Bar - Desktop Right / Row 2 (Mobile) */}
+          <form onSubmit={handleSearchSubmit} className="cat-search-pill" style={{ display: "flex", alignItems: "center" }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="cat-search-input"
+            />
+          </form>
 
-            <Link href="/cart" className="cat-cart-btn" title="Cart" style={{ textDecoration: "none" }}>
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
+          <div className="cat-nav-actions">
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="prf-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="prf-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
+            </div>
+
+            <Link href="/cart" className="cat-cart-btn" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
@@ -321,14 +433,13 @@ export default function ProfilePage() {
             <div className="prf-user-row">
               <div className="prf-avatar-wrap">
                 <Image
-                  src="/images/profile/sophie_avatar_precise.png"
-                  alt="Sophie Laurent 3D Avatar"
-                  width={88}
-                  height={88}
+                  src="/images/model_face.jpg"
+                  alt="Sophie Laurent Profile Picture"
+                  width={80}
+                  height={80}
                   className="prf-avatar-img"
                   priority
                 />
-                <span className="prf-avatar-3d-tag">3D</span>
               </div>
 
               <div className="prf-user-info">
@@ -345,7 +456,7 @@ export default function ProfilePage() {
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
                     </svg>
-                    <span>Pro Member</span>
+                    <span>{t.proMember}</span>
                   </div>
                 </Link>
               </div>
@@ -366,22 +477,22 @@ export default function ProfilePage() {
                   </svg>
                 </div>
                 <div className="prf-scan-texts">
-                  <div className="prf-scan-title">Last 3D Scan: Oct 20, 2026</div>
-                  <div className="prf-scan-score">Quality Score 98%</div>
+                  <div className="prf-scan-title">{t.lastScan}</div>
+                  <div className="prf-scan-score">{t.qualityScore}</div>
                 </div>
               </div>
 
-              <div style={{ width: "1px", height: "26px", backgroundColor: "#cbd5e1" }} />
+              <div className="prf-scan-divider" />
 
               <Link href="/3d-studio" className="prf-recalibrate-btn" title="Launch 3D Calibration Studio">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
                 </svg>
-                <span>Recalibrate My 3D Avatar</span>
+                <span>{t.recalibrate}</span>
               </Link>
             </div>
 
-            {/* 3 Navigation Menu Cards */}
+            {/* Navigation Menu Cards including Subscription Plan */}
             <div className="prf-menu-list">
               
               {/* Item 1: Style Preferences */}
@@ -397,8 +508,8 @@ export default function ProfilePage() {
                     <circle cx="12" cy="7" r="4"></circle>
                   </svg>
                   <div className="prf-menu-title-group">
-                    <h3 className="prf-menu-title">Style Preferences</h3>
-                    <p className="prf-menu-sub">Your style, fit and appearance preferences ({preferredFit})</p>
+                    <h3 className="prf-menu-title">{t.stylePrefTitle}</h3>
+                    <p className="prf-menu-sub">{t.stylePrefSub} ({preferredFit})</p>
                   </div>
                 </div>
                 <svg className="prf-menu-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -419,8 +530,8 @@ export default function ProfilePage() {
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                   </svg>
                   <div className="prf-menu-title-group">
-                    <h3 className="prf-menu-title">Stock &amp; Size Alerts</h3>
-                    <p className="prf-menu-sub">Get notified when your size or favorite items are back ({alerts.filter(a => a.active).length} active)</p>
+                    <h3 className="prf-menu-title">{t.stockAlertsTitle}</h3>
+                    <p className="prf-menu-sub">{t.stockAlertsSub} ({alerts.filter(a => a.active).length} active)</p>
                   </div>
                 </div>
                 <svg className="prf-menu-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -441,14 +552,35 @@ export default function ProfilePage() {
                     <line x1="2" x2="22" y1="10" y2="10"></line>
                   </svg>
                   <div className="prf-menu-title-group">
-                    <h3 className="prf-menu-title">Payment &amp; Invoice History</h3>
-                    <p className="prf-menu-sub">View your transactions and download invoices</p>
+                    <h3 className="prf-menu-title">{t.invoiceHistoryTitle}</h3>
+                    <p className="prf-menu-sub">{t.invoiceHistorySub}</p>
                   </div>
                 </div>
                 <svg className="prf-menu-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </div>
+
+              {/* Item 4: Subscription & VIP Plan */}
+              <Link 
+                href="/pricing"
+                className="prf-menu-item"
+                title="Manage Subscription & VIP Plan"
+                style={{ cursor: "pointer", textDecoration: "none" }}
+              >
+                <div className="prf-menu-left">
+                  <svg className="prf-menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <div className="prf-menu-title-group">
+                    <h3 className="prf-menu-title">{t.subscriptionPlanTitle}</h3>
+                    <p className="prf-menu-sub">{t.subscriptionPlanSub}</p>
+                  </div>
+                </div>
+                <svg className="prf-menu-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </Link>
 
             </div>
 
@@ -464,10 +596,8 @@ export default function ProfilePage() {
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
               <div className="prf-vault-title-group">
-                <h2 className="prf-vault-title">Privacy &amp; Biometric Data Vault</h2>
-                <p className="prf-vault-sub">
-                  Your data, your control. We follow full GDPR compliance and keep your biometric information safe and private.
-                </p>
+                <h2 className="prf-vault-title">{t.vaultTitle}</h2>
+                <p className="prf-vault-sub">{t.vaultSub}</p>
               </div>
             </div>
 
@@ -480,8 +610,8 @@ export default function ProfilePage() {
                     <path d="m9 12 2 2 4-4"></path>
                   </svg>
                   <div className="prf-anon-title-group">
-                    <h3 className="prf-anon-title">Anonymous Mode</h3>
-                    <p className="prf-anon-sub">Blur your face in community style feed to stay private.</p>
+                    <h3 className="prf-anon-title">{t.anonymousTitle}</h3>
+                    <p className="prf-anon-sub">{t.anonymousSub}</p>
                   </div>
                 </div>
 
@@ -494,8 +624,8 @@ export default function ProfilePage() {
                         setAnonymousMode(e.target.checked);
                         showNotification(
                           e.target.checked
-                            ? "Anonymous Mode enabled: Face blurred in feed"
-                            : "Anonymous Mode disabled: Public face enabled"
+                            ? "Anonymous Mode enabled"
+                            : "Anonymous Mode disabled"
                         );
                       }} 
                     />
@@ -507,7 +637,7 @@ export default function ProfilePage() {
               {/* Subtext aligned right under toggle switch as in screenshot */}
               <div style={{ textAlign: "right", marginTop: "2px" }}>
                 <span style={{ fontSize: "10.5px", color: "#2563eb", fontWeight: 500 }}>
-                  Blur face in community style feed
+                  {t.anonymousToggleSub}
                 </span>
               </div>
             </div>
@@ -523,8 +653,8 @@ export default function ProfilePage() {
                   <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
                 <div className="prf-rights-title-group">
-                  <h3 className="prf-rights-title">Data Rights Actions</h3>
-                  <span className="prf-rights-sub">Full GDPR compliance</span>
+                  <h3 className="prf-rights-title">{t.dataRightsTitle}</h3>
+                  <span className="prf-rights-sub">{t.gdprNotice}</span>
                 </div>
               </div>
 
@@ -538,7 +668,8 @@ export default function ProfilePage() {
                     background: "#eff6ff",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    flexShrink: 0
                   }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -547,8 +678,8 @@ export default function ProfilePage() {
                     </svg>
                   </div>
                   <div className="prf-action-title-group">
-                    <h4 className="prf-action-title">Export All Biometric Data</h4>
-                    <p className="prf-action-sub">Download JSON &amp; 3D OBJ Mesh</p>
+                    <h4 className="prf-action-title">{t.exportDataTitle}</h4>
+                    <p className="prf-action-sub">{t.exportDataSub}</p>
                   </div>
                 </div>
 
@@ -562,7 +693,7 @@ export default function ProfilePage() {
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
-                  <span>Download</span>
+                  <span>{t.downloadBtn}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
@@ -579,7 +710,8 @@ export default function ProfilePage() {
                     background: "#eff6ff",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    flexShrink: 0
                   }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
@@ -587,8 +719,8 @@ export default function ProfilePage() {
                     </svg>
                   </div>
                   <div className="prf-action-title-group">
-                    <h4 className="prf-action-title">Manage AI Processing Consents</h4>
-                    <p className="prf-action-sub">Control how your data is used for AI improvements.</p>
+                    <h4 className="prf-action-title">{t.manageConsentsTitle}</h4>
+                    <p className="prf-action-sub">{t.manageConsentsSub}</p>
                   </div>
                 </div>
 
@@ -597,7 +729,7 @@ export default function ProfilePage() {
                   onClick={() => setShowConsentModal(true)} 
                   className="prf-action-btn-pill"
                 >
-                  <span>Manage Consents</span>
+                  <span>{t.manageConsentsBtn}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
@@ -616,8 +748,8 @@ export default function ProfilePage() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="prf-danger-title">Right to be Forgotten</h4>
-                    <p className="prf-danger-sub">Permanently delete my account and all 3D body meshes.</p>
+                    <h4 className="prf-danger-title">{t.forgottenTitle}</h4>
+                    <p className="prf-danger-sub">{t.forgottenSub}</p>
                   </div>
                 </div>
 
@@ -630,7 +762,7 @@ export default function ProfilePage() {
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                   </svg>
-                  <span>Delete Personal Data &amp; Account</span>
+                  <span>{t.deleteBtn}</span>
                 </button>
               </div>
 

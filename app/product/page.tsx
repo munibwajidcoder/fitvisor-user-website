@@ -1,19 +1,216 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 
+const translations = {
+  EN: {
+    navHome: "Home",
+    navCatalog: "Catalog",
+    navStudio: "3D Studio",
+    navWardrobe: "Wardrobe",
+    searchPlaceholder: "Search brands, styles, or items...",
+    cartTitle: "Cart",
+    profileTitle: "User Profile",
+    saveToWardrobe: "Save to Wardrobe",
+    removeFromWardrobe: "Remove from Wardrobe",
+    savedToast: 'Saved "Balmain Wool Blazer" to your Wardrobe!',
+    removedToast: "Removed from your Wardrobe",
+    addedToCartToast: "Added to Cart! (1 item)",
+    viewVideo: "View Video",
+    trustAuth: "Authentic Brands",
+    trustAuthSub: "100% Original",
+    trustPay: "Secure Payments",
+    trustPaySub: "Klarna / Stripe",
+    trustRet: "Free Returns",
+    trustRetSub: "Within 30 Days",
+    trustSupport: "24/7 Support",
+    trustSupportSub: "Fashion Experts",
+    brandName: "B A L M A I N",
+    brandCity: "P A R I S",
+    productTitle: "Tailored Structured Wool Grain de Poudre Blazer",
+    price: "$1,290.00",
+    klarna: "or 4 interest-free payments of $322.50",
+    aiBoxTitle: "FitVisor AI Recommendation",
+    aiPowered: "Powered by your 3D body scan ✦",
+    aiRecSize: "Recommended Size: 40 (FR) — Confidence 96%",
+    aiReason:
+      "Reason: Perfect fit across your shoulders (42cm). 2cm comfortable ease at waist for a flattering tailored silhouette.",
+    colorLabel: "Color:",
+    colors: {
+      "Navy Blue": "Navy Blue",
+      Black: "Black",
+      Camel: "Camel",
+    },
+    sizeLabel: "Size:",
+    sizeHint: "Runs true to size. Check your FitVisor measurements.",
+    recommended: "Recommended",
+    tryIn3D: "Try in 3D on My Avatar",
+    viewTensionMap: "View Real-Time Fabric Tension Heatmap",
+    addToCart: "Add to Cart",
+    reserveInStore: "Reserve in Store for Physical Fitting",
+    reserveBooked: "Fitting Booked for Tomorrow ✓",
+    reserveLocation: "Available at Downtown Store 📍",
+    accFabricTitle: "Fabric & Stretch",
+    accFabricSub: "98% Virgin Wool, 2% Elastane",
+    accFabricBody:
+      "Expertly tailored in France using premium grain de poudre wool with natural give for all-day comfort. Dry clean only.",
+    accShippingTitle: "Shipping & Free Returns Policy",
+    accShippingBody:
+      "Enjoy complimentary DHL Express 2-day shipping and prepaid 30-day hassle-free returns on all FitVisor verified orders.",
+    viewWardrobe: "View Wardrobe →",
+    viewCart: "View Cart →",
+  },
+  FR: {
+    navHome: "Accueil",
+    navCatalog: "Catalogue",
+    navStudio: "Studio 3D",
+    navWardrobe: "Garde-robe",
+    searchPlaceholder: "Rechercher des marques, styles...",
+    cartTitle: "Panier",
+    profileTitle: "Profil utilisateur",
+    saveToWardrobe: "Enregistrer dans la garde-robe",
+    removeFromWardrobe: "Retirer de la garde-robe",
+    savedToast: 'Ajouté "Blazer en laine Balmain" à votre garde-robe !',
+    removedToast: "Retiré de votre garde-robe",
+    addedToCartToast: "Ajouté au panier ! (1 article)",
+    viewVideo: "Voir la vidéo",
+    trustAuth: "Marques authentiques",
+    trustAuthSub: "100% Original",
+    trustPay: "Paiements sécurisés",
+    trustPaySub: "Klarna / Stripe",
+    trustRet: "Retours gratuits",
+    trustRetSub: "Sous 30 jours",
+    trustSupport: "Support 24/7",
+    trustSupportSub: "Experts mode",
+    brandName: "B A L M A I N",
+    brandCity: "P A R I S",
+    productTitle: "Blazer structuré en laine Grain de Poudre ajusté",
+    price: "$1,290.00",
+    klarna: "ou 4 paiements sans frais de 322,50 $",
+    aiBoxTitle: "Recommandation IA FitVisor",
+    aiPowered: "Basé sur votre scan corporel 3D ✦",
+    aiRecSize: "Taille recommandée : 40 (FR) — Confiance 96%",
+    aiReason:
+      "Raison : Coupe parfaite sur vos épaules (42 cm). 2 cm d'aisance confortable à la taille pour une silhouette flatteuse.",
+    colorLabel: "Couleur :",
+    colors: {
+      "Navy Blue": "Bleu marine",
+      Black: "Noir",
+      Camel: "Camel",
+    },
+    sizeLabel: "Taille :",
+    sizeHint: "Taille normalement. Vérifiez vos mesures FitVisor.",
+    recommended: "Recommandé",
+    tryIn3D: "Essayer en 3D sur mon avatar",
+    viewTensionMap: "Voir la carte thermique de tension du tissu",
+    addToCart: "Ajouter au panier",
+    reserveInStore: "Réserver en boutique pour essayage physique",
+    reserveBooked: "Essayage réservé pour demain ✓",
+    reserveLocation: "Disponible en boutique centre-ville 📍",
+    accFabricTitle: "Tissu & Élasticité",
+    accFabricSub: "98% Laine vierge, 2% Élasthanne",
+    accFabricBody:
+      "Confectionné avec expertise en France dans une laine grain de poudre haut de gamme avec élasticité naturelle pour un confort optimal. Nettoyage à sec uniquement.",
+    accShippingTitle: "Politique de livraison & retours gratuits",
+    accShippingBody:
+      "Profitez de la livraison express DHL gratuite en 2 jours et des retours prépayés simplifiés sous 30 jours sur toutes les commandes vérifiées FitVisor.",
+    viewWardrobe: "Voir la garde-robe →",
+    viewCart: "Voir le panier →",
+  },
+};
+
 export default function ProductDetailPage() {
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  // Load language preference from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const t = translations[lang];
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("Navy Blue");
+  const [selectedColor, setSelectedColor] = useState<"Navy Blue" | "Black" | "Camel">("Navy Blue");
   const [selectedSize, setSelectedSize] = useState("40");
   const [cartCount, setCartCount] = useState(2);
   const [isReserved, setIsReserved] = useState(false);
   const [fabricOpen, setFabricOpen] = useState(false);
   const [shippingOpen, setShippingOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState<{ text: string; link: string; linkText: string } | null>(null);
+
+  // Sync isLiked with localStorage saved catalog items
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("fitvisor_saved_catalog_ids");
+      if (stored) {
+        const ids: number[] = JSON.parse(stored);
+        if (ids.includes(1)) {
+          setIsLiked(true);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const toggleFavorite = () => {
+    const nextState = !isLiked;
+    setIsLiked(nextState);
+
+    try {
+      // 1. Sync catalog IDs
+      const storedIds = localStorage.getItem("fitvisor_saved_catalog_ids");
+      let ids: number[] = storedIds ? JSON.parse(storedIds) : [];
+      if (nextState) {
+        if (!ids.includes(1)) ids.push(1);
+      } else {
+        ids = ids.filter((id) => id !== 1);
+      }
+      localStorage.setItem("fitvisor_saved_catalog_ids", JSON.stringify(ids));
+
+      // 2. Sync wardrobe saved garments
+      const storedItems = localStorage.getItem("fitvisor_saved_wardrobe_items");
+      let items: any[] = storedItems ? JSON.parse(storedItems) : [];
+      if (nextState) {
+        if (!items.some((item) => item.id === "cat-1" || item.id === "sg2")) {
+          items.push({
+            id: "cat-1",
+            name: lang === "FR" ? "Blazer structuré en laine ajustée" : "Tailored Structured Wool Blazer",
+            brand: "BALMAIN",
+            price: "$1,290.00",
+            category: "Outerwear",
+            thumb: "/images/catalog/catalog_1_balmain_men.png",
+          });
+        }
+      } else {
+        items = items.filter((item) => item.id !== "cat-1");
+      }
+      localStorage.setItem("fitvisor_saved_wardrobe_items", JSON.stringify(items));
+    } catch (err) {
+      console.error(err);
+    }
+
+    setToastMsg({
+      text: nextState ? t.savedToast : t.removedToast,
+      link: "/wardrobe",
+      linkText: t.viewWardrobe,
+    });
+    setTimeout(() => setToastMsg(null), 3200);
+  };
 
   // Gallery Photos
   const galleryImages = [
@@ -53,9 +250,15 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     setCartCount((prev) => prev + 1);
+    setToastMsg({
+      text: t.addedToCartToast,
+      link: "/cart",
+      linkText: t.viewCart,
+    });
+    setTimeout(() => setToastMsg(null), 3200);
   };
 
-  const colors = [
+  const colors: Array<{ name: "Navy Blue" | "Black" | "Camel"; hex: string }> = [
     { name: "Navy Blue", hex: "#1e293b" },
     { name: "Black", hex: "#0f172a" },
     { name: "Camel", hex: "#c29b7f" },
@@ -73,64 +276,85 @@ export default function ProductDetailPage() {
     <div className="pdp-page-wrapper">
       <div className="pdp-container">
         {/* =========================================================
-            HEADER / NAVBAR
+            HEADER / NAVBAR (Standard cat-navbar across FitVisor)
             ========================================================= */}
-        <header className="pdp-navbar">
-          <div className="pdp-nav-brand">
+        <header className="cat-navbar" style={{ marginBottom: "26px" }}>
+          {/* Brand Logo - Row 1 Left */}
+          <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
-          <nav className="pdp-nav-menu">
-            <Link href="/" className="pdp-nav-item active">
-              Home
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
+          <nav className="cat-nav-menu">
+            <Link href="/" className="cat-nav-item">
+              {t.navHome}
             </Link>
-            <Link href="/catalog" className="pdp-nav-item">
-              Catalog
+            <Link href="/catalog" className="cat-nav-item active">
+              {t.navCatalog}
             </Link>
-            <Link href="/3d-studio" className="pdp-nav-item">
-              3D Studio
+            <Link href="/3d-studio" className="cat-nav-item">
+              {t.navStudio}
             </Link>
-            <Link href="/wardrobe" className="pdp-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="/community" className="pdp-nav-item">
-              Community
+            <Link href="/wardrobe" className="cat-nav-item">
+              {t.navWardrobe}
             </Link>
           </nav>
 
-          <div className="pdp-nav-actions">
-            <div className="pdp-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                className="pdp-search-input"
-              />
+          {/* Search Pill - Center Right (Desktop) / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
+          <div className="cat-nav-actions">
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="pdp-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="pdp-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <Link href="/cart" className="pdp-cart-btn" title="Cart" style={{ textDecoration: "none" }}>
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span className="pdp-cart-badge">{cartCount}</span>
+              <span className="cat-cart-badge">{cartCount}</span>
             </Link>
 
-            <Link href="/digital-twin" className="pdp-user-avatar-wrap" title="User Profile">
+            {/* User Profile Avatar */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
                 width={32}
                 height={32}
-                className="pdp-user-avatar-img"
+                className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="pdp-user-chevron">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
             </Link>
           </div>
         </header>
@@ -160,12 +384,13 @@ export default function ProductDetailPage() {
                   <span className="pdp-brand-sub-text">PARIS</span>
                 </div>
 
-                {/* Favorite Heart Button */}
+                {/* Favorite Heart Button -> Saves to Wardrobe */}
                 <button
                   type="button"
                   className={`pdp-heart-btn ${isLiked ? "liked" : ""}`}
-                  onClick={() => setIsLiked(!isLiked)}
-                  title="Save to Wishlist"
+                  onClick={toggleFavorite}
+                  title={isLiked ? t.removeFromWardrobe : t.saveToWardrobe}
+                  aria-label="Save to Wardrobe"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill={isLiked ? "#ef4444" : "#ffffff"} stroke={isLiked ? "#ef4444" : "#94a3b8"} strokeWidth="1.8">
                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -279,7 +504,7 @@ export default function ProductDetailPage() {
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
                 </div>
-                <span className="pdp-video-label">View Video</span>
+                <span className="pdp-video-label">{t.viewVideo}</span>
               </button>
             </div>
 
@@ -293,8 +518,8 @@ export default function ProductDetailPage() {
                   </svg>
                 </div>
                 <div className="pdp-trust-text">
-                  <span className="pdp-trust-title">Authentic Brands</span>
-                  <span className="pdp-trust-sub">100% Original</span>
+                  <span className="pdp-trust-title">{t.trustAuth}</span>
+                  <span className="pdp-trust-sub">{t.trustAuthSub}</span>
                 </div>
               </div>
 
@@ -306,8 +531,8 @@ export default function ProductDetailPage() {
                   </svg>
                 </div>
                 <div className="pdp-trust-text">
-                  <span className="pdp-trust-title">Secure Payments</span>
-                  <span className="pdp-trust-sub">Klarna / Stripe</span>
+                  <span className="pdp-trust-title">{t.trustPay}</span>
+                  <span className="pdp-trust-sub">{t.trustPaySub}</span>
                 </div>
               </div>
 
@@ -320,8 +545,8 @@ export default function ProductDetailPage() {
                   </svg>
                 </div>
                 <div className="pdp-trust-text">
-                  <span className="pdp-trust-title">Free Returns</span>
-                  <span className="pdp-trust-sub">Within 30 Days</span>
+                  <span className="pdp-trust-title">{t.trustRet}</span>
+                  <span className="pdp-trust-sub">{t.trustRetSub}</span>
                 </div>
               </div>
 
@@ -333,8 +558,8 @@ export default function ProductDetailPage() {
                   </svg>
                 </div>
                 <div className="pdp-trust-text">
-                  <span className="pdp-trust-title">24/7 Support</span>
-                  <span className="pdp-trust-sub">Fashion Experts</span>
+                  <span className="pdp-trust-title">{t.trustSupport}</span>
+                  <span className="pdp-trust-sub">{t.trustSupportSub}</span>
                 </div>
               </div>
             </div>
@@ -344,21 +569,17 @@ export default function ProductDetailPage() {
           <div className="pdp-details-card">
             {/* Brand Logo */}
             <div className="pdp-brand-header">
-              <span className="pdp-brand-name">B A L M A I N</span>
-              <span className="pdp-brand-city">P A R I S</span>
+              <span className="pdp-brand-name">{t.brandName}</span>
+              <span className="pdp-brand-city">{t.brandCity}</span>
             </div>
 
             {/* Product Title */}
-            <h1 className="pdp-product-title">
-              Tailored Structured Wool Grain de Poudre Blazer
-            </h1>
+            <h1 className="pdp-product-title">{t.productTitle}</h1>
 
             {/* Price & Klarna Installments */}
             <div className="pdp-price-row">
-              <span className="pdp-main-price">$1,290.00</span>
-              <span className="pdp-klarna-text">
-                or 4 interest-free payments of $322.50
-              </span>
+              <span className="pdp-main-price">{t.price}</span>
+              <span className="pdp-klarna-text">{t.klarna}</span>
               <span className="pdp-klarna-badge">Klarna.</span>
             </div>
 
@@ -371,9 +592,9 @@ export default function ProductDetailPage() {
                     <path d="M11 20 3.5 12.5a2.12 2.12 0 0 1 3-3L14 17" />
                     <path d="m9 18 3 3" />
                   </svg>
-                  <span className="pdp-ai-title">FitVisor AI Recommendation</span>
+                  <span className="pdp-ai-title">{t.aiBoxTitle}</span>
                 </div>
-                <span className="pdp-ai-powered">Powered by your 3D body scan ✦</span>
+                <span className="pdp-ai-powered">{t.aiPowered}</span>
               </div>
 
               <div className="pdp-ai-rec-row">
@@ -382,21 +603,17 @@ export default function ProductDetailPage() {
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </div>
-                <span className="pdp-rec-size-text">
-                  Recommended Size: <strong>M (US 6)</strong> &mdash; Confidence <strong>96%</strong>
-                </span>
+                <span className="pdp-rec-size-text">{t.aiRecSize}</span>
               </div>
 
-              <p className="pdp-ai-reason">
-                <strong>Reason:</strong> Perfect fit across your shoulders (42cm). 2cm comfortable ease at waist for a flattering tailored silhouette.
-              </p>
+              <p className="pdp-ai-reason">{t.aiReason}</p>
             </div>
 
             {/* Color Selector */}
             <div className="pdp-option-group">
               <div className="pdp-option-label-row">
-                <span className="pdp-option-label">Color:</span>
-                <span className="pdp-option-value">{selectedColor}</span>
+                <span className="pdp-option-label">{t.colorLabel}</span>
+                <span className="pdp-option-value">{t.colors[selectedColor]}</span>
               </div>
               <div className="pdp-color-swatches">
                 {colors.map((c) => (
@@ -406,7 +623,7 @@ export default function ProductDetailPage() {
                     className={`pdp-swatch-circle ${selectedColor === c.name ? "active" : ""}`}
                     style={{ backgroundColor: c.hex }}
                     onClick={() => setSelectedColor(c.name)}
-                    title={c.name}
+                    title={t.colors[c.name]}
                   />
                 ))}
               </div>
@@ -415,16 +632,14 @@ export default function ProductDetailPage() {
             {/* Size Selector */}
             <div className="pdp-option-group">
               <div className="pdp-option-label-row">
-                <span className="pdp-option-label">Size:</span>
-                <span className="pdp-size-hint">
-                  Runs true to size. Check your FitVisor measurements.
-                </span>
+                <span className="pdp-option-label">{t.sizeLabel}</span>
+                <span className="pdp-size-hint">{t.sizeHint}</span>
               </div>
               <div className="pdp-size-row">
                 {sizes.map((s) => (
                   <div key={s.size} className="pdp-size-btn-wrap">
                     {s.recommended && (
-                      <span className="pdp-rec-tag">Recommended</span>
+                      <span className="pdp-rec-tag">{t.recommended}</span>
                     )}
                     <button
                       type="button"
@@ -439,12 +654,12 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Primary Action 1: Try in 3D */}
-            <Link href="/digital-twin" className="pdp-tryon-cta-btn">
+            <Link href="/3d-studio" className="pdp-tryon-cta-btn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M16 7a4 4 0 0 0-8 0v1" />
                 <path d="M2 17l10-8 10 8H2z" />
               </svg>
-              <span>Try in 3D on My Avatar</span>
+              <span>{t.tryIn3D}</span>
             </Link>
 
             {/* Primary Action 2: Add to Cart */}
@@ -458,7 +673,7 @@ export default function ProductDetailPage() {
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span>Add to Cart</span>
+              <span>{t.addToCart}</span>
             </button>
 
             {/* Reserve in Store Fitting Card */}
@@ -474,9 +689,9 @@ export default function ProductDetailPage() {
               </div>
               <div className="pdp-reserve-text">
                 <span className="pdp-reserve-title">
-                  {isReserved ? "Fitting Booked for Tomorrow ✓" : "Reserve in Store for Physical Fitting"}
+                  {isReserved ? t.reserveBooked : t.reserveInStore}
                 </span>
-                <span className="pdp-reserve-sub">Available at Downtown Store 📍</span>
+                <span className="pdp-reserve-sub">{t.reserveLocation}</span>
               </div>
             </button>
 
@@ -496,8 +711,8 @@ export default function ProductDetailPage() {
                     <line x1="8.12" x2="12" y1="8.12" y2="12" />
                   </svg>
                   <div className="pdp-accordion-title-col">
-                    <span className="pdp-acc-title">Fabric &amp; Stretch</span>
-                    <span className="pdp-acc-sub">98% Virgin Wool, 2% Elastane</span>
+                    <span className="pdp-acc-title">{t.accFabricTitle}</span>
+                    <span className="pdp-acc-sub">{t.accFabricSub}</span>
                   </div>
                 </div>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`pdp-acc-chevron ${fabricOpen ? "open" : ""}`}>
@@ -506,7 +721,7 @@ export default function ProductDetailPage() {
               </button>
               {fabricOpen && (
                 <div className="pdp-accordion-content">
-                  <p>Expertly tailored in France using premium grain de poudre wool with natural give for all-day comfort. Dry clean only.</p>
+                  <p>{t.accFabricBody}</p>
                 </div>
               )}
             </div>
@@ -521,11 +736,11 @@ export default function ProductDetailPage() {
                 <div className="pdp-accordion-left">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect width="16" height="13" x="1" y="3" rx="2" />
-                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
                     <circle cx="5.5" cy="18.5" r="2.5" />
                     <circle cx="18.5" cy="18.5" r="2.5" />
                   </svg>
-                  <span className="pdp-acc-title">Shipping &amp; Free Returns Policy</span>
+                  <span className="pdp-acc-title">{t.accShippingTitle}</span>
                 </div>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`pdp-acc-chevron ${shippingOpen ? "open" : ""}`}>
                   <polyline points="6 9 12 15 18 9" />
@@ -533,12 +748,25 @@ export default function ProductDetailPage() {
               </button>
               {shippingOpen && (
                 <div className="pdp-accordion-content">
-                  <p>Enjoy complimentary DHL Express 2-day shipping and prepaid 30-day hassle-free returns on all FitVisor verified orders.</p>
+                  <p>{t.accShippingBody}</p>
                 </div>
               )}
             </div>
           </div>
         </div>
+
+        {/* Dynamic Toast Feedback Notification */}
+        {toastMsg && (
+          <div className="cat-toast-banner">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" strokeWidth="2">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <span>{toastMsg.text}</span>
+            <Link href={toastMsg.link} className="cat-toast-link">
+              {toastMsg.linkText}
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

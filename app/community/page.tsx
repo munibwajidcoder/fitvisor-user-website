@@ -187,7 +187,7 @@ export default function CommunityPage() {
               <span className="cat-cart-badge">3</span>
             </Link>
 
-            <div className="cat-user-avatar-wrap" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <Link href="/profile" className="cat-user-avatar-wrap" title="User Profile" style={{ display: "flex", alignItems: "center", gap: "4px", textDecoration: "none" }}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
@@ -198,7 +198,7 @@ export default function CommunityPage() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
-            </div>
+            </Link>
           </div>
         </header>
 

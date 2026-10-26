@@ -1,8 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+
+const translations = {
+  EN: {
+    welcomeBack: "Welcome Back",
+    subtitle: "Access your virtual wardrobe and saved 3D try-on looks.",
+    emailPlaceholder: "Email address",
+    passwordPlaceholder: "Password",
+    forgotPassword: "Forgot password?",
+    signIn: "Sign In",
+    orContinueWith: "or continue with",
+    appleId: "Apple ID",
+    google: "Google",
+    newToFitvisor: "New to Fitvisor?",
+    createAccount: "Create an account in 1 minute",
+  },
+  FR: {
+    welcomeBack: "Bon Retour",
+    subtitle: "Accédez à votre garde-robe virtuelle et vos essayages 3D sauvegardés.",
+    emailPlaceholder: "Adresse e-mail",
+    passwordPlaceholder: "Mot de passe",
+    forgotPassword: "Mot de passe oublié ?",
+    signIn: "Se connecter",
+    orContinueWith: "ou continuer avec",
+    appleId: "Apple ID",
+    google: "Google",
+    newToFitvisor: "Nouveau sur Fitvisor ?",
+    createAccount: "Créer un compte en 1 minute",
+  },
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,6 +40,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const t = translations[lang];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +68,8 @@ export default function LoginPage() {
       <div className="login-lang-switch">
         <button
           type="button"
-          onClick={() => setLang("EN")}
+          id="lang-btn-en"
+          onClick={() => changeLang("EN")}
           className={`lang-btn ${lang === "EN" ? "active" : ""}`}
         >
           EN
@@ -30,7 +77,8 @@ export default function LoginPage() {
         <span className="lang-pipe">|</span>
         <button
           type="button"
-          onClick={() => setLang("FR")}
+          id="lang-btn-fr"
+          onClick={() => changeLang("FR")}
           className={`lang-btn ${lang === "FR" ? "active" : ""}`}
         >
           FR
@@ -39,71 +87,23 @@ export default function LoginPage() {
 
       {/* Main Login Card */}
       <div className="login-card">
-        {/* Stacked FitVisor Logo */}
+        {/* Official FitVisor Logo */}
         <div className="login-logo-container">
           <Link href="/" title="FitVisor Home">
-            <svg
-              width="118"
-              height="102"
-              viewBox="0 0 118 102"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* Rounded square container with red border */}
-              <rect
-                x="20"
-                y="3"
-                width="78"
-                height="68"
-                rx="16"
-                fill="#FFFFFF"
-                stroke="#E53E42"
-                strokeWidth="3.5"
-              />
-
-              {/* Top navy bar of the 'F' emblem */}
-              <path d="M 33 18 H 85 L 77 28 H 39 Z" fill="#1C2243" />
-
-              {/* Middle navy bar */}
-              <path d="M 42 34 H 75 L 68 44 H 42 Z" fill="#1C2243" />
-
-              {/* Bottom coral-red triangle */}
-              <path d="M 49 49 H 61 L 61 63 Z" fill="#E53E42" />
-
-              {/* Text "Fit" */}
-              <text
-                x="18"
-                y="94"
-                fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Outfit', 'Inter', sans-serif"
-                fontSize="24"
-                fontWeight="800"
-                letterSpacing="-0.02em"
-                fill="#E53E42"
-              >
-                Fit
-              </text>
-
-              {/* Text "Visor" */}
-              <text
-                x="52"
-                y="94"
-                fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Outfit', 'Inter', sans-serif"
-                fontSize="24"
-                fontWeight="800"
-                letterSpacing="-0.02em"
-                fill="#1C2243"
-              >
-                Visor
-              </text>
-            </svg>
+            <Image
+              src="/images/fitvisor_logo_square.png"
+              alt="FitVisor"
+              width={120}
+              height={120}
+              priority
+              className="login-logo-img"
+            />
           </Link>
         </div>
 
         {/* Heading */}
-        <h1 className="login-title">Welcome Back</h1>
-        <p className="login-subtitle">
-          Access your virtual wardrobe and saved 3D try-on looks.
-        </p>
+        <h1 className="login-title">{t.welcomeBack}</h1>
+        <p className="login-subtitle">{t.subtitle}</p>
 
         {/* Sign In Form */}
         <form onSubmit={handleSubmit} className="login-form">
@@ -126,9 +126,10 @@ export default function LoginPage() {
             </span>
             <input
               type="email"
+              id="login-email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email address"
+              placeholder={t.emailPlaceholder}
               className="login-input"
               required
             />
@@ -153,9 +154,10 @@ export default function LoginPage() {
             </span>
             <input
               type={showPassword ? "text" : "password"}
+              id="login-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={t.passwordPlaceholder}
               className="login-input"
               required
             />
@@ -201,33 +203,33 @@ export default function LoginPage() {
           {/* Forgot Password Link */}
           <div className="forgot-password-row">
             <Link href="#forgot" className="forgot-password-link">
-              Forgot password?
+              {t.forgotPassword}
             </Link>
           </div>
 
           {/* Sign In CTA Button */}
-          <button type="submit" className="login-submit-btn">
-            Sign In
+          <button type="submit" id="login-submit-btn" className="login-submit-btn">
+            {t.signIn}
           </button>
         </form>
 
         {/* Or continue with divider */}
         <div className="login-divider-row">
-          <span className="divider-label">or continue with</span>
+          <span className="divider-label">{t.orContinueWith}</span>
         </div>
 
         {/* Social Logins */}
         <div className="social-buttons-grid">
           {/* Apple ID */}
-          <button type="button" className="social-login-btn">
+          <button type="button" id="social-apple-btn" className="social-login-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#1C2243">
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.66-.8 1.11-1.92.99-3.04-.96.04-2.11.64-2.8 1.44-.61.7-.87 1.83-.99 2.97 1.08.08 2.15-.57 2.8-1.37z" />
             </svg>
-            <span>Apple ID</span>
+            <span>{t.appleId}</span>
           </button>
 
           {/* Google */}
-          <button type="button" className="social-login-btn">
+          <button type="button" id="social-google-btn" className="social-login-btn">
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -246,15 +248,15 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
-            <span>Google</span>
+            <span>{t.google}</span>
           </button>
         </div>
 
         {/* Sign up prompt footer */}
         <div className="login-card-footer">
-          <span>New to Fitvisor?</span>{" "}
+          <span>{t.newToFitvisor}</span>{" "}
           <Link href="/register" className="create-account-link">
-            <span>Create an account in 1 minute</span>
+            <span>{t.createAccount}</span>
             <svg
               width="14"
               height="14"

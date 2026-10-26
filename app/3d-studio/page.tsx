@@ -1,20 +1,136 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 
 export default function ThreeDStudioPage() {
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setLang(saved);
+    }
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fitvisor_lang", newLang);
+    }
+  };
+
+  const translations = {
+    EN: {
+      navHome: "Home",
+      navCatalog: "Catalog",
+      navStudio: "3D Studio",
+      navWardrobe: "Wardrobe",
+      navPricing: "Plans",
+      navCommunity: "Community",
+      searchPlaceholder: "Search brands, styles, or items...",
+      cartTitle: "Cart",
+      profileTitle: "User Profile",
+      outfitLayers: "Current Outfit Layers",
+      silkShirt: "White Silk Shirt",
+      navyBlazer: "Navy Blazer",
+      slimTrousers: "Slim Trousers",
+      addGarment: "Add garment to look",
+      studioLighting: "Studio Lighting",
+      daylight: "Daylight\n(5500K)",
+      storeLight: "Store\nLight",
+      eveningGala: "Evening\nGala",
+      rotateHint: "Drag or swipe to rotate avatar 360°",
+      autoRotate: "Auto 360°",
+      pause: "Pause",
+      frontView: "Front 0°",
+      fitConfidence: "Fit Confidence Score",
+      optimalFit: "Optimal Fit",
+      shoulders: "Shoulders",
+      chest: "Chest",
+      waist: "Waist",
+      hips: "Hips",
+      length: "Length",
+      excellent: "✔ Excellent",
+      size: "Size",
+      studioTools: "Studio Tools",
+      tensionMap: "Fabric Tension Heatmap",
+      tensionSub: "See how the fabric fits and moves",
+      layering: "Multi-Garment Layering",
+      layeringSub: "Try different combinations",
+      compare: "Compare 2 Sizes / Looks",
+      compareSub: "See side by side comparison",
+      saveOutfit: "Save Outfit to Wardrobe",
+      savedOutfit: "Saved to Wardrobe ✓",
+      saveOutfitSub: "Keep this look for later",
+      askFriend: "Ask a Friend",
+      askFriendSub: "Live style feedback",
+      purchaseLook: "Purchase This Look • $1,290.00",
+      addedToCart: "Added to Cart! ✓",
+    },
+    FR: {
+      navHome: "Accueil",
+      navCatalog: "Catalogue",
+      navStudio: "Studio 3D",
+      navWardrobe: "Garde-robe",
+      navPricing: "Tarifs",
+      navCommunity: "Communauté",
+      searchPlaceholder: "Rechercher des marques, styles...",
+      cartTitle: "Panier",
+      profileTitle: "Profil utilisateur",
+      outfitLayers: "Couches de la tenue",
+      silkShirt: "Chemise en soie blanche",
+      navyBlazer: "Blazer bleu marine",
+      slimTrousers: "Pantalon ajusté",
+      addGarment: "Ajouter un vêtement au look",
+      studioLighting: "Éclairage Studio",
+      daylight: "Jour\n(5500K)",
+      storeLight: "Boutique\nStore",
+      eveningGala: "Soirée\nGala",
+      rotateHint: "Glissez ou balayez pour pivoter à 360°",
+      autoRotate: "Auto 360°",
+      pause: "Pause",
+      frontView: "Face 0°",
+      fitConfidence: "Indice d'ajustement",
+      optimalFit: "Ajustement optimal",
+      shoulders: "Épaules",
+      chest: "Poitrine",
+      waist: "Taille",
+      hips: "Hanches",
+      length: "Longueur",
+      excellent: "✔ Excellent",
+      size: "Taille",
+      studioTools: "Outils Studio",
+      tensionMap: "Carte de tension du tissu",
+      tensionSub: "Voir comment le tissu s'ajuste et bouge",
+      layering: "Superposition multi-vêtements",
+      layeringSub: "Essayer différentes combinaisons",
+      compare: "Comparer 2 tailles / looks",
+      compareSub: "Voir la comparaison côte à côte",
+      saveOutfit: "Enregistrer la tenue",
+      savedOutfit: "Enregistrée dans la garde-robe ✓",
+      saveOutfitSub: "Conserver ce look pour plus tard",
+      askFriend: "Demander l'avis d'un ami",
+      askFriendSub: "Commentaires de style en direct",
+      purchaseLook: "Acheter ce look • 1 290,00 $",
+      addedToCart: "Ajouté au panier ! ✓",
+    },
+  };
+
+  const t = translations[lang];
+
   // Studio Interactive States
   const [activeLighting, setActiveLighting] = useState<"daylight" | "store" | "evening">("daylight");
   const [rotationAngle, setRotationAngle] = useState(0);
+  const [autoRotate, setAutoRotate] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [selectedSize, setSelectedSize] = useState("M");
   const [isSavedToWardrobe, setIsSavedToWardrobe] = useState(false);
   const [cartCount, setCartCount] = useState(1);
-  const [activeTool, setActiveTool] = useState<string | null>(null);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
   // Garment visibility layers toggle
   const [layersVisibility, setLayersVisibility] = useState<Record<string, boolean>>({
@@ -27,8 +143,18 @@ export default function ThreeDStudioPage() {
     setLayersVisibility((prev) => ({ ...prev, [layer]: !prev[layer] }));
   };
 
-  // Drag-to-rotate interaction handlers
+  // Continuous Auto-Rotation loop
+  useEffect(() => {
+    if (!autoRotate) return;
+    const interval = setInterval(() => {
+      setRotationAngle((prev) => (prev + 1) % 360);
+    }, 40);
+    return () => clearInterval(interval);
+  }, [autoRotate]);
+
+  // Mouse Drag handlers for Desktop
   const handleMouseDown = (e: React.MouseEvent) => {
+    setAutoRotate(false);
     setIsDragging(true);
     setDragStartX(e.clientX);
   };
@@ -36,7 +162,7 @@ export default function ThreeDStudioPage() {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
     const deltaX = e.clientX - dragStartX;
-    setRotationAngle((prev) => (prev + deltaX * 0.4) % 360);
+    setRotationAngle((prev) => (prev + deltaX * 0.5 + 360) % 360);
     setDragStartX(e.clientX);
   };
 
@@ -44,73 +170,117 @@ export default function ThreeDStudioPage() {
     setIsDragging(false);
   };
 
+  // Touch Swipe handlers for Mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setAutoRotate(false);
+      setIsDragging(true);
+      setDragStartX(e.touches[0].clientX);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    const deltaX = e.touches[0].clientX - dragStartX;
+    setRotationAngle((prev) => (prev + deltaX * 0.7 + 360) % 360);
+    setDragStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
   const handlePurchase = () => {
     setCartCount((prev) => prev + 1);
+    setPurchaseSuccess(true);
+    setTimeout(() => setPurchaseSuccess(false), 2400);
   };
 
   return (
     <div
       className={`stu-page-wrapper lighting-${activeLighting}`}
       onMouseUp={handleMouseUp}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="stu-container">
-        {/* ================= HEADER / NAVBAR ================= */}
-        <header className="stu-navbar">
-          <div className="stu-nav-brand">
+        {/* ================= UNIVERSAL CONSISTENT HEADER / NAVBAR ================= */}
+        <header className="cat-navbar" style={{ marginBottom: "24px" }}>
+          {/* Brand Logo - Row 1 Left */}
+          <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
-          <nav className="stu-nav-menu">
-            <Link href="/" className="stu-nav-item">
-              Home
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
+          <nav className="cat-nav-menu">
+            <Link href="/" className="cat-nav-item">
+              {t.navHome}
             </Link>
-            <Link href="/catalog" className="stu-nav-item">
-              Catalog
+            <Link href="/catalog" className="cat-nav-item">
+              {t.navCatalog}
             </Link>
-            <Link href="/3d-studio" className="stu-nav-item active">
-              3D Studio
+            <Link href="/3d-studio" className="cat-nav-item active">
+              {t.navStudio}
             </Link>
-            <Link href="/wardrobe" className="stu-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="/community" className="stu-nav-item">
-              Community
+            <Link href="/wardrobe" className="cat-nav-item">
+              {t.navWardrobe}
             </Link>
           </nav>
 
-          <div className="stu-nav-actions">
-            <div className="stu-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                className="stu-search-input"
-              />
+          {/* Search Bar - Desktop Right / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
+          <div className="cat-nav-actions">
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="stu-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="stu-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <button type="button" className="stu-cart-btn" title="Cart">
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span className="stu-cart-badge">{cartCount}</span>
-            </button>
+              <span className="cat-cart-badge">{cartCount}</span>
+            </Link>
 
-            <Link href="/digital-twin" className="stu-user-avatar-wrap" title="User Profile">
+            {/* User Profile */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
                 width={32}
                 height={32}
-                className="stu-user-avatar-img"
+                className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
             </Link>
           </div>
         </header>
@@ -126,7 +296,7 @@ export default function ThreeDStudioPage() {
                   <polyline points="2 17 12 22 22 17" />
                   <polyline points="2 12 12 17 22 12" />
                 </svg>
-                <h2 className="stu-layers-title">Current Outfit Layers</h2>
+                <h2 className="stu-layers-title">{t.outfitLayers}</h2>
               </div>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="18 15 12 9 6 15" />
@@ -145,7 +315,7 @@ export default function ThreeDStudioPage() {
                 />
               </div>
               <div className="stu-layer-info">
-                <span className="stu-layer-name">White Silk Shirt</span>
+                <span className="stu-layer-name">{t.silkShirt}</span>
                 <span className="stu-layer-brand">BALMAIN</span>
               </div>
               <div className="stu-layer-actions">
@@ -171,13 +341,6 @@ export default function ThreeDStudioPage() {
                     )}
                   </svg>
                 </button>
-                <button type="button" className="stu-layer-icon-btn" title="Options">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                </button>
               </div>
             </div>
 
@@ -193,7 +356,7 @@ export default function ThreeDStudioPage() {
                 />
               </div>
               <div className="stu-layer-info">
-                <span className="stu-layer-name">Navy Blazer</span>
+                <span className="stu-layer-name">{t.navyBlazer}</span>
                 <span className="stu-layer-brand">BALMAIN</span>
               </div>
               <div className="stu-layer-actions">
@@ -219,13 +382,6 @@ export default function ThreeDStudioPage() {
                     )}
                   </svg>
                 </button>
-                <button type="button" className="stu-layer-icon-btn" title="Options">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                </button>
               </div>
             </div>
 
@@ -241,7 +397,7 @@ export default function ThreeDStudioPage() {
                 />
               </div>
               <div className="stu-layer-info">
-                <span className="stu-layer-name">Slim Trousers</span>
+                <span className="stu-layer-name">{t.slimTrousers}</span>
                 <span className="stu-layer-brand">BALMAIN</span>
               </div>
               <div className="stu-layer-actions">
@@ -267,13 +423,6 @@ export default function ThreeDStudioPage() {
                     )}
                   </svg>
                 </button>
-                <button type="button" className="stu-layer-icon-btn" title="Options">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                </button>
               </div>
             </div>
 
@@ -283,7 +432,7 @@ export default function ThreeDStudioPage() {
                 <line x1="12" x2="12" y1="5" y2="19" />
                 <line x1="5" x2="19" y1="12" y2="12" />
               </svg>
-              <span>Add garment to look</span>
+              <span>{t.addGarment}</span>
             </Link>
           </aside>
 
@@ -292,15 +441,18 @@ export default function ThreeDStudioPage() {
             className="stu-stage-viewport"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            {/* Top-Left Floating Studio Lighting Widget */}
+            {/* Top Studio Lighting Widget */}
             <div className="stu-lighting-widget">
               <div className="stu-lighting-header">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="4" />
                   <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
                 </svg>
-                <span className="stu-lighting-title">Studio Lighting</span>
+                <span className="stu-lighting-title">{t.studioLighting}</span>
               </div>
               <div className="stu-lighting-options">
                 <button
@@ -319,7 +471,7 @@ export default function ThreeDStudioPage() {
                       <line x1="21" x2="23" y1="12" y2="12" />
                     </svg>
                   </div>
-                  <span className="stu-light-label">Daylight<br />(5500K)</span>
+                  <span className="stu-light-label" style={{ whiteSpace: "pre-line" }}>{t.daylight}</span>
                 </button>
 
                 <button
@@ -333,7 +485,7 @@ export default function ThreeDStudioPage() {
                       <polyline points="9 22 9 12 15 12 15 22" />
                     </svg>
                   </div>
-                  <span className="stu-light-label">Store<br />Lighting</span>
+                  <span className="stu-light-label" style={{ whiteSpace: "pre-line" }}>{t.storeLight}</span>
                 </button>
 
                 <button
@@ -346,12 +498,12 @@ export default function ThreeDStudioPage() {
                       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                     </svg>
                   </div>
-                  <span className="stu-light-label">Evening<br />Gala</span>
+                  <span className="stu-light-label" style={{ whiteSpace: "pre-line" }}>{t.eveningGala}</span>
                 </button>
               </div>
             </div>
 
-            {/* 3D Model & Pedestal Display */}
+            {/* 3D Model & Pedestal Display with Smooth 360° Rotation */}
             <div
               className="stu-model-wrapper"
               style={{
@@ -360,13 +512,95 @@ export default function ThreeDStudioPage() {
               }}
             >
               <Image
-                src="/images/studio/studio_center_stage.png"
+                src="/images/studio/avatar_3d_studio.png"
                 alt="3D Balmain Suit Digital Twin"
-                width={364}
-                height={366}
+                width={420}
+                height={560}
                 priority
                 className="stu-model-stage-img"
               />
+            </div>
+
+            {/* Floating 360° Interactive Controls Bar */}
+            <div className="stu-rotate-dock">
+              <button
+                type="button"
+                className="stu-rotate-btn"
+                onClick={() => {
+                  setAutoRotate(false);
+                  setRotationAngle((prev) => (prev - 45 + 360) % 360);
+                }}
+                title="Rotate Left -45°"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                <span>-45°</span>
+              </button>
+
+              <button
+                type="button"
+                className={`stu-rotate-btn stu-auto-btn ${autoRotate ? "active" : ""}`}
+                onClick={() => setAutoRotate(!autoRotate)}
+                title={autoRotate ? "Pause Auto-Rotate" : "Auto-Rotate 360°"}
+              >
+                {autoRotate ? (
+                  <>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="4" width="4" height="16" rx="1" />
+                      <rect x="14" y="4" width="4" height="16" rx="1" />
+                    </svg>
+                    <span>{t.pause}</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    <span>{t.autoRotate}</span>
+                  </>
+                )}
+              </button>
+
+              <div className="stu-angle-badge" title="Current View Angle">
+                {Math.round(((rotationAngle % 360) + 360) % 360)}°
+              </div>
+
+              <button
+                type="button"
+                className="stu-rotate-btn"
+                onClick={() => {
+                  setAutoRotate(false);
+                  setRotationAngle((prev) => (prev + 45) % 360);
+                }}
+                title="Rotate Right +45°"
+              >
+                <span>+45°</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                  <path d="M21 3v5h-5" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                className="stu-rotate-btn stu-reset-btn"
+                onClick={() => {
+                  setAutoRotate(false);
+                  setRotationAngle(0);
+                }}
+                title="Reset Front View (0°)"
+              >
+                {t.frontView}
+              </button>
+            </div>
+
+            <div className="stu-drag-hint">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+              </svg>
+              <span>{t.rotateHint}</span>
             </div>
           </div>
 
@@ -383,7 +617,7 @@ export default function ThreeDStudioPage() {
                     <line x1="12" x2="12" y1="6" y2="2" />
                     <line x1="12" x2="12" y1="22" y2="18" />
                   </svg>
-                  <h3 className="stu-conf-title">Fit Confidence Score</h3>
+                  <h3 className="stu-conf-title">{t.fitConfidence}</h3>
                 </div>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
@@ -419,30 +653,30 @@ export default function ThreeDStudioPage() {
                   </svg>
                   <div className="stu-gauge-inner">
                     <span className="stu-gauge-pct">96%</span>
-                    <span className="stu-gauge-label">Optimal Fit</span>
+                    <span className="stu-gauge-label">{t.optimalFit}</span>
                   </div>
                 </div>
 
                 <div className="stu-breakdown-list">
                   <div className="stu-breakdown-row">
-                    <span className="stu-breakdown-name">Shoulders</span>
-                    <span className="stu-breakdown-val">✔ Excellent</span>
+                    <span className="stu-breakdown-name">{t.shoulders}</span>
+                    <span className="stu-breakdown-val">{t.excellent}</span>
                   </div>
                   <div className="stu-breakdown-row">
-                    <span className="stu-breakdown-name">Chest</span>
-                    <span className="stu-breakdown-val">✔ Excellent</span>
+                    <span className="stu-breakdown-name">{t.chest}</span>
+                    <span className="stu-breakdown-val">{t.excellent}</span>
                   </div>
                   <div className="stu-breakdown-row">
-                    <span className="stu-breakdown-name">Waist</span>
-                    <span className="stu-breakdown-val">✔ Excellent</span>
+                    <span className="stu-breakdown-name">{t.waist}</span>
+                    <span className="stu-breakdown-val">{t.excellent}</span>
                   </div>
                   <div className="stu-breakdown-row">
-                    <span className="stu-breakdown-name">Hips</span>
-                    <span className="stu-breakdown-val">✔ Excellent</span>
+                    <span className="stu-breakdown-name">{t.hips}</span>
+                    <span className="stu-breakdown-val">{t.excellent}</span>
                   </div>
                   <div className="stu-breakdown-row">
-                    <span className="stu-breakdown-name">Length</span>
-                    <span className="stu-breakdown-val">✔ Excellent</span>
+                    <span className="stu-breakdown-name">{t.length}</span>
+                    <span className="stu-breakdown-val">{t.excellent}</span>
                   </div>
                 </div>
               </div>
@@ -454,7 +688,7 @@ export default function ThreeDStudioPage() {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
                 </svg>
-                <span className="stu-size-title">Size</span>
+                <span className="stu-size-title">{t.size}</span>
               </div>
               <div className="stu-size-pills">
                 {["S", "M", "L"].map((sz) => (
@@ -476,7 +710,7 @@ export default function ThreeDStudioPage() {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                 </svg>
-                <span className="stu-tools-title">Studio Tools</span>
+                <span className="stu-tools-title">{t.studioTools}</span>
               </div>
 
               <div className="stu-tools-list">
@@ -494,8 +728,8 @@ export default function ThreeDStudioPage() {
                     />
                   </div>
                   <div className="stu-tool-text">
-                    <span className="stu-tool-name">Fabric Tension Heatmap</span>
-                    <span className="stu-tool-sub">See how the fabric fits and moves</span>
+                    <span className="stu-tool-name">{t.tensionMap}</span>
+                    <span className="stu-tool-sub">{t.tensionSub}</span>
                   </div>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="stu-tool-arrow">
                     <polyline points="9 18 15 12 9 6" />
@@ -515,8 +749,8 @@ export default function ThreeDStudioPage() {
                     </svg>
                   </div>
                   <div className="stu-tool-text">
-                    <span className="stu-tool-name">Multi-Garment Layering</span>
-                    <span className="stu-tool-sub">Try different combinations</span>
+                    <span className="stu-tool-name">{t.layering}</span>
+                    <span className="stu-tool-sub">{t.layeringSub}</span>
                   </div>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="stu-tool-arrow">
                     <polyline points="9 18 15 12 9 6" />
@@ -535,8 +769,8 @@ export default function ThreeDStudioPage() {
                     </svg>
                   </div>
                   <div className="stu-tool-text">
-                    <span className="stu-tool-name">Compare 2 Sizes / Looks</span>
-                    <span className="stu-tool-sub">See side by side comparison</span>
+                    <span className="stu-tool-name">{t.compare}</span>
+                    <span className="stu-tool-sub">{t.compareSub}</span>
                   </div>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="stu-tool-arrow">
                     <polyline points="9 18 15 12 9 6" />
@@ -547,47 +781,49 @@ export default function ThreeDStudioPage() {
           </aside>
         </div>
 
-        {/* ================= BOTTOM FLOATING ACTION BAR ================= */}
+        {/* ================= BOTTOM FLOATING ACTION DOCK ================= */}
         <div className="stu-bottom-dock">
-          {/* Action 1: Save Outfit to Wardrobe */}
-          <button
-            type="button"
-            className={`stu-dock-btn ${isSavedToWardrobe ? "active" : ""}`}
-            onClick={() => setIsSavedToWardrobe(!isSavedToWardrobe)}
-          >
-            <div className="stu-dock-icon-circle">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill={isSavedToWardrobe ? "#ef4444" : "none"} stroke={isSavedToWardrobe ? "#ef4444" : "#1e293b"} strokeWidth="2">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-              </svg>
-            </div>
-            <div className="stu-dock-text">
-              <span className="stu-dock-title">
-                {isSavedToWardrobe ? "Saved to Wardrobe ✓" : "Save Outfit to Wardrobe"}
-              </span>
-              <span className="stu-dock-sub">Keep this look for later</span>
-            </div>
-          </button>
+          <div className="stu-dock-actions-row">
+            {/* Action 1: Save Outfit to Wardrobe */}
+            <button
+              type="button"
+              className={`stu-dock-btn ${isSavedToWardrobe ? "active" : ""}`}
+              onClick={() => setIsSavedToWardrobe(!isSavedToWardrobe)}
+            >
+              <div className="stu-dock-icon-circle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={isSavedToWardrobe ? "#ef4444" : "none"} stroke={isSavedToWardrobe ? "#ef4444" : "#1e293b"} strokeWidth="2">
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+              </div>
+              <div className="stu-dock-text">
+                <span className="stu-dock-title">
+                  {isSavedToWardrobe ? t.savedOutfit : t.saveOutfit}
+                </span>
+                <span className="stu-dock-sub">{t.saveOutfitSub}</span>
+              </div>
+            </button>
 
-          <div className="stu-dock-divider" />
+            <div className="stu-dock-divider" />
 
-          {/* Action 2: Ask a Friend */}
-          <Link
-            href="/3d-studio/ask-friend"
-            className="stu-dock-btn"
-          >
-            <div className="stu-dock-icon-circle">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <div className="stu-dock-text">
-              <span className="stu-dock-title">Ask a Friend</span>
-              <span className="stu-dock-sub">Live style feedback</span>
-            </div>
-          </Link>
+            {/* Action 2: Ask a Friend */}
+            <Link
+              href="/3d-studio/ask-friend"
+              className="stu-dock-btn"
+            >
+              <div className="stu-dock-icon-circle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div className="stu-dock-text">
+                <span className="stu-dock-title">{t.askFriend}</span>
+                <span className="stu-dock-sub">{t.askFriendSub}</span>
+              </div>
+            </Link>
+          </div>
 
           {/* Action 3: Purchase This Look CTA */}
           <button
@@ -600,7 +836,7 @@ export default function ThreeDStudioPage() {
               <circle cx="19" cy="21" r="1" />
               <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
             </svg>
-            <span>Purchase This Look &bull; $1,290.00</span>
+            <span>{purchaseSuccess ? t.addedToCart : t.purchaseLook}</span>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />

@@ -1,20 +1,130 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 
+const translations = {
+  EN: {
+    navHome: "Home",
+    navCatalog: "Catalog",
+    navStudio: "3D Studio",
+    navWardrobe: "Wardrobe",
+    searchPlaceholder: "Search brands, styles, or items...",
+    cartTitle: "Cart",
+    profileTitle: "User Profile",
+    badgeA: "Blazer Size M (Navy)",
+    badgeB: "Blazer Size L (Navy)",
+    gaugeOptimal: "Fit Score",
+    gaugeRelaxed: "Fit Score",
+    pillTailoredA: "Tailored business silhouette",
+    pillWristA: "Classic wrist length",
+    pillOversizedB: "Relaxed oversized silhouette",
+    pillSleeveB: "Sleeves +2.5cm",
+    syncLabel: "Synchronized 360° dual avatar rotation",
+    syncSpin: "360°",
+    syncSub: "Both avatars rotate together",
+    tableTitle: "Key Fit Attributes Comparison",
+    colFeature: "Attribute",
+    colA: "Size M (Navy)",
+    colB: "Size L (Navy)",
+    rowShoulders: "Shoulders",
+    valShouldersA: "Fitted",
+    valShouldersB: "Dropped shoulder",
+    rowHemline: "Hemline Length",
+    valHemlineA: "Mid-hip",
+    valHemlineB: "+4cm longer",
+    rowMobility: "Mobility & Movement",
+    valMobilityA: "8.5 / 10",
+    valMobilityB: "9.8 / 10",
+    winnerTitle: "Overall Winner",
+    winnerBadge: "Size M",
+    winnerDesc: "Better tailored fit for a sharper, professional look.",
+    btnM: "Select Size M",
+    btnMSelected: "Selected Size M ✓",
+    btnL: "Select Size L",
+    btnLSelected: "Selected Size L ✓",
+    toastAddedM: "Selected Blazer Size M (Added to Cart)!",
+    toastAddedL: "Selected Blazer Size L (Added to Cart)!",
+    viewCart: "View Cart →",
+  },
+  FR: {
+    navHome: "Accueil",
+    navCatalog: "Catalogue",
+    navStudio: "Studio 3D",
+    navWardrobe: "Garde-robe",
+    searchPlaceholder: "Rechercher des marques, styles...",
+    cartTitle: "Panier",
+    profileTitle: "Profil utilisateur",
+    badgeA: "Blazer Taille M (Bleu marine)",
+    badgeB: "Blazer Taille L (Bleu marine)",
+    gaugeOptimal: "Score de coupe",
+    gaugeRelaxed: "Score de coupe",
+    pillTailoredA: "Silhouette ajustée business",
+    pillWristA: "Longueur poignet classique",
+    pillOversizedB: "Silhouette oversize décontractée",
+    pillSleeveB: "Manches +2.5cm",
+    syncLabel: "Rotation synchronisée 360° des avatars",
+    syncSpin: "360°",
+    syncSub: "Les deux avatars tournent ensemble",
+    tableTitle: "Comparatif des critères d'ajustement",
+    colFeature: "Critère",
+    colA: "Taille M (Marine)",
+    colB: "Taille L (Marine)",
+    rowShoulders: "Épaules",
+    valShouldersA: "Ajusté",
+    valShouldersB: "Épaule tombante",
+    rowHemline: "Longueur d'ourlet",
+    valHemlineA: "Mi-hanche",
+    valHemlineB: "+4cm plus long",
+    rowMobility: "Mobilité & Mouvement",
+    valMobilityA: "8.5 / 10",
+    valMobilityB: "9.8 / 10",
+    winnerTitle: "Recommandation gagnante",
+    winnerBadge: "Taille M",
+    winnerDesc: "Meilleur ajustement structuré pour un style élégant et professionnel.",
+    btnM: "Choisir Taille M",
+    btnMSelected: "Taille M choisie ✓",
+    btnL: "Choisir Taille L",
+    btnLSelected: "Taille L choisie ✓",
+    toastAddedM: "Blazer Taille M choisi (Ajouté au panier) !",
+    toastAddedL: "Blazer Taille L choisi (Ajouté au panier) !",
+    viewCart: "Voir panier →",
+  },
+};
+
 export default function CompareSizesPage() {
+  const [lang, setLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fitvisor_lang");
+      if (saved === "EN" || saved === "FR") {
+        setLang(saved);
+      }
+    } catch {}
+  }, []);
+
+  const changeLang = (newLang: "EN" | "FR") => {
+    setLang(newLang);
+    try {
+      localStorage.setItem("fitvisor_lang", newLang);
+    } catch {}
+  };
+
+  const t = translations[lang];
+
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isDraggingA, setIsDraggingA] = useState(false);
   const [isDraggingB, setIsDraggingB] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [isSyncRotation, setIsSyncRotation] = useState(true);
-  const [activeAngleA, setActiveAngleA] = useState("front");
-  const [activeAngleB, setActiveAngleB] = useState("front");
-  const [selectedWinner, setSelectedWinner] = useState<"M" | "L" | null>("M");
+  const [activeAngleA, setActiveAngleA] = useState<"front" | "side" | "back" | "angle">("front");
+  const [activeAngleB, setActiveAngleB] = useState<"front" | "side" | "back" | "angle">("front");
+  const [selectedWinner, setSelectedWinner] = useState<"M" | "L">("M");
   const [cartCount, setCartCount] = useState(3);
+  const [toastMsg, setToastMsg] = useState<{ text: string; link: string; linkText: string } | null>(null);
 
   // Rotation handlers
   const handleMouseDownA = (e: React.MouseEvent) => {
@@ -46,11 +156,23 @@ export default function CompareSizesPage() {
   const handleSelectSizeM = () => {
     setSelectedWinner("M");
     setCartCount((prev) => prev + 1);
+    setToastMsg({
+      text: t.toastAddedM,
+      link: "/cart",
+      linkText: t.viewCart,
+    });
+    setTimeout(() => setToastMsg(null), 3200);
   };
 
   const handleSelectSizeL = () => {
     setSelectedWinner("L");
     setCartCount((prev) => prev + 1);
+    setToastMsg({
+      text: t.toastAddedL,
+      link: "/cart",
+      linkText: t.viewCart,
+    });
+    setTimeout(() => setToastMsg(null), 3200);
   };
 
   return (
@@ -60,68 +182,84 @@ export default function CompareSizesPage() {
       onMouseMove={handleMouseMove}
     >
       <div className="cmp-container">
-        {/* ================= HEADER / NAVBAR ================= */}
-        <header className="stu-navbar">
-          <div className="stu-nav-brand">
+        {/* ================= HEADER / NAVBAR (Standard cat-navbar) ================= */}
+        <header className="cat-navbar" style={{ marginBottom: "24px" }}>
+          {/* Brand Logo - Row 1 Left */}
+          <div className="cat-nav-brand">
             <Logo size="md" />
           </div>
 
-          <nav className="stu-nav-menu">
-            <Link href="/" className="stu-nav-item">
-              Home
+          {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
+          <nav className="cat-nav-menu">
+            <Link href="/" className="cat-nav-item">
+              {t.navHome}
             </Link>
-            <Link href="/catalog" className="stu-nav-item">
-              Catalog
+            <Link href="/catalog" className="cat-nav-item">
+              {t.navCatalog}
             </Link>
-            <Link href="/3d-studio" className="stu-nav-item active">
-              3D Studio
+            <Link href="/3d-studio" className="cat-nav-item active">
+              {t.navStudio}
             </Link>
-            <Link href="#wardrobe" className="stu-nav-item">
-              Wardrobe
-            </Link>
-            <Link href="#community" className="stu-nav-item">
-              Community
+            <Link href="/wardrobe" className="cat-nav-item">
+              {t.navWardrobe}
             </Link>
           </nav>
 
-          <div className="stu-nav-actions">
-            <div className="stu-search-pill">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search brands, styles, or items..."
-                className="stu-search-input"
-              />
+          {/* Search Pill - Center Right (Desktop) / Row 2 (Mobile) */}
+          <div className="cat-search-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              className="cat-search-input"
+            />
+          </div>
+
+          {/* Action Icons Cluster: Lang Switch, Cart, Profile - Row 1 Right */}
+          <div className="cat-nav-actions">
+            {/* Language Switch */}
+            <div className="fv-lang-switch">
+              <button
+                type="button"
+                id="cmp-lang-btn-en"
+                onClick={() => changeLang("EN")}
+                className={`lang-btn ${lang === "EN" ? "active" : ""}`}
+              >
+                EN
+              </button>
+              <span className="lang-pipe">|</span>
+              <button
+                type="button"
+                id="cmp-lang-btn-fr"
+                onClick={() => changeLang("FR")}
+                className={`lang-btn ${lang === "FR" ? "active" : ""}`}
+              >
+                FR
+              </button>
             </div>
 
-            <button
-              type="button"
-              className="stu-cart-btn"
-              title="Cart"
-              onClick={() => setCartCount((prev) => prev + 1)}
-            >
+            {/* Shopping Cart Link */}
+            <Link href="/cart" className="cat-cart-btn" title={t.cartTitle} style={{ textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span className="stu-cart-badge">{cartCount}</span>
-            </button>
+              <span className="cat-cart-badge">{cartCount}</span>
+            </Link>
 
-            <Link href="/digital-twin" className="stu-user-avatar-wrap" title="User Profile">
+            {/* User Profile Avatar */}
+            <Link href="/profile" className="cat-user-avatar-wrap" title={t.profileTitle}>
               <Image
                 src="/images/model_face.jpg"
                 alt="User Profile"
                 width={32}
                 height={32}
-                className="stu-user-avatar-img"
+                className="cat-user-avatar-img"
               />
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
             </Link>
           </div>
         </header>
@@ -133,12 +271,12 @@ export default function CompareSizesPage() {
             {/* Stage Pill Badge */}
             <div className="cmp-stage-badge">
               <span className="cmp-badge-circle">A</span>
-              <span className="cmp-badge-label">Blazer Size M (Navy)</span>
+              <span className="cmp-badge-label">{t.badgeA}</span>
             </div>
 
             {/* Floating Metrics (Left) */}
             <div className="cmp-stage-metrics">
-              {/* Radial Fit Score Gauge (96% Optimal Fit) */}
+              {/* Radial Fit Score Gauge (96% Fit Score) */}
               <div className="cmp-gauge-ring-wrap">
                 <svg width="76" height="76" viewBox="0 0 100 100">
                   <circle
@@ -164,26 +302,28 @@ export default function CompareSizesPage() {
                 </svg>
                 <div className="cmp-gauge-inner">
                   <span className="cmp-gauge-pct">96%</span>
-                  <span className="cmp-gauge-sub">Fit Score</span>
-                  <span className="cmp-gauge-status" style={{ color: "#10b981" }}>✔</span>
+                  <span className="cmp-gauge-sub">{t.gaugeOptimal}</span>
+                  <span className="cmp-gauge-status">🎯</span>
                 </div>
               </div>
 
-              {/* Attribute Tag 1: Tailored business silhouette */}
+              {/* Feature Tags */}
               <div className="cmp-feature-pill">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="5" r="2" />
                   <path d="m14 7 8 8-2 2-6-6-6 6-2-2 8-8" />
                 </svg>
-                <span>Tailored business silhouette</span>
+                <span>{t.pillTailoredA}</span>
               </div>
-
-              {/* Attribute Tag 2: Classic wrist length */}
               <div className="cmp-feature-pill">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
                 </svg>
-                <span>Classic wrist length</span>
+                <span>{t.pillWristA}</span>
               </div>
             </div>
 
@@ -199,8 +339,8 @@ export default function CompareSizesPage() {
               <Image
                 src="/images/compare/model_a_pedestal.png"
                 alt="Blazer Size M Avatar on Pedestal"
-                width={215}
-                height={370}
+                width={220}
+                height={380}
                 priority
                 className="cmp-stage-img"
               />
@@ -253,7 +393,7 @@ export default function CompareSizesPage() {
                   </svg>
                 )}
               </div>
-              <span>Synchronized 360° dual avatar rotation</span>
+              <span>{t.syncLabel}</span>
             </label>
 
             <button
@@ -265,18 +405,18 @@ export default function CompareSizesPage() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
               </svg>
-              <span>360°</span>
+              <span>{t.syncSpin}</span>
             </button>
 
-            <span className="cmp-sync-subtext">Both avatars rotate together</span>
+            <span className="cmp-sync-subtext">{t.syncSub}</span>
           </div>
 
           {/* ================= STAGE B: SIZE L (NAVY) ================= */}
           <div className="cmp-stage-card">
             {/* Stage Pill Badge */}
             <div className="cmp-stage-badge">
-              <span className="cmp-badge-circle">B</span>
-              <span className="cmp-badge-label">Blazer Size L (Navy)</span>
+              <span className="cmp-badge-circle" style={{ background: "#2563eb" }}>B</span>
+              <span className="cmp-badge-label">{t.badgeB}</span>
             </div>
 
             {/* Floating Metrics (Left) */}
@@ -307,7 +447,7 @@ export default function CompareSizesPage() {
                 </svg>
                 <div className="cmp-gauge-inner">
                   <span className="cmp-gauge-pct">89%</span>
-                  <span className="cmp-gauge-sub">Fit Score</span>
+                  <span className="cmp-gauge-sub">{t.gaugeRelaxed}</span>
                   <span className="cmp-gauge-status" style={{ color: "#ef4444" }}>⚠</span>
                 </div>
               </div>
@@ -318,7 +458,7 @@ export default function CompareSizesPage() {
                   <circle cx="12" cy="5" r="2" />
                   <path d="m14 7 8 8-2 2-6-6-6 6-2-2 8-8" />
                 </svg>
-                <span>Relaxed oversized silhouette</span>
+                <span>{t.pillOversizedB}</span>
               </div>
 
               {/* Attribute Tag 2: Sleeves +2.5cm */}
@@ -330,7 +470,7 @@ export default function CompareSizesPage() {
                   <line x1="16" y1="17" x2="8" y2="17" />
                   <polyline points="10 9 9 9 8 9" />
                 </svg>
-                <span>Sleeves +2.5cm</span>
+                <span>{t.pillSleeveB}</span>
               </div>
             </div>
 
@@ -346,8 +486,8 @@ export default function CompareSizesPage() {
               <Image
                 src="/images/compare/model_b_pedestal.png"
                 alt="Blazer Size L Avatar on Pedestal"
-                width={215}
-                height={370}
+                width={220}
+                height={380}
                 priority
                 className="cmp-stage-img"
               />
@@ -403,20 +543,20 @@ export default function CompareSizesPage() {
                 <path d="M12 3v18" />
                 <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
               </svg>
-              <h2 className="cmp-table-title">Side-by-Side Fit Comparison</h2>
+              <h2 className="cmp-table-title">{t.tableTitle}</h2>
             </div>
 
             <div className="cmp-matrix">
-              {/* Header */}
+              {/* Table Header */}
               <div className="cmp-matrix-head">
-                <div className="cmp-matrix-head-col cmp-col-feature" />
+                <div className="cmp-matrix-head-col cmp-col-feature">{t.colFeature}</div>
                 <div className="cmp-matrix-head-col cmp-col-a">
                   <span className="cmp-pill-indicator a">A</span>
-                  <span>Size M (Navy)</span>
+                  <span>{t.colA}</span>
                 </div>
                 <div className="cmp-matrix-head-col cmp-col-b">
                   <span className="cmp-pill-indicator b">B</span>
-                  <span>Size L (Navy)</span>
+                  <span>{t.colB}</span>
                 </div>
               </div>
 
@@ -426,15 +566,15 @@ export default function CompareSizesPage() {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
                   </svg>
-                  <span>Shoulders</span>
+                  <span>{t.rowShoulders}</span>
                 </div>
                 <div className="cmp-cell-val">
                   <span className="cmp-status-dot green">✔</span>
-                  <span>Fitted</span>
+                  <span>{t.valShouldersA}</span>
                 </div>
                 <div className="cmp-cell-val">
                   <span className="cmp-status-dot yellow">●</span>
-                  <span>Dropped shoulder</span>
+                  <span>{t.valShouldersB}</span>
                 </div>
               </div>
 
@@ -444,15 +584,15 @@ export default function CompareSizesPage() {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M6 3v18M18 3v18M6 8c4 0 4 8 0 8M18 8c-4 0-4 8 0 8" />
                   </svg>
-                  <span>Hemline Length</span>
+                  <span>{t.rowHemline}</span>
                 </div>
                 <div className="cmp-cell-val">
                   <span className="cmp-status-dot green">✔</span>
-                  <span>Mid-hip</span>
+                  <span>{t.valHemlineA}</span>
                 </div>
                 <div className="cmp-cell-val">
                   <span className="cmp-status-dot yellow">●</span>
-                  <span>+4cm longer</span>
+                  <span>{t.valHemlineB}</span>
                 </div>
               </div>
 
@@ -466,15 +606,15 @@ export default function CompareSizesPage() {
                     <line x1="12" x2="12" y1="6" y2="2" />
                     <line x1="12" x2="12" y1="22" y2="18" />
                   </svg>
-                  <span>Mobility &amp; Movement</span>
+                  <span>{t.rowMobility}</span>
                 </div>
                 <div className="cmp-cell-val">
                   <span className="cmp-status-dot blue">✔</span>
-                  <span>8.5/10</span>
+                  <span>{t.valMobilityA}</span>
                 </div>
                 <div className="cmp-cell-val">
                   <span className="cmp-status-dot green">✔</span>
-                  <span>9.8/10</span>
+                  <span>{t.valMobilityB}</span>
                 </div>
               </div>
             </div>
@@ -493,13 +633,13 @@ export default function CompareSizesPage() {
                     <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
                     <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
                   </svg>
-                  <h3 className="cmp-winner-title">Overall Winner</h3>
+                  <h3 className="cmp-winner-title">{t.winnerTitle}</h3>
                 </div>
-                <span className="cmp-winner-badge">Size M</span>
+                <span className="cmp-winner-badge">{t.winnerBadge}</span>
               </div>
 
               <p className="cmp-winner-desc" style={{ marginTop: "10px" }}>
-                Better tailored fit for a sharper, professional look.
+                {t.winnerDesc}
               </p>
             </div>
 
@@ -513,7 +653,7 @@ export default function CompareSizesPage() {
                   <circle cx="12" cy="5" r="2" />
                   <path d="m14 7 8 8-2 2-6-6-6 6-2-2 8-8" />
                 </svg>
-                <span>{selectedWinner === "M" ? "Selected Size M ✓" : "Select Size M"}</span>
+                <span>{selectedWinner === "M" ? t.btnMSelected : t.btnM}</span>
               </button>
 
               <button
@@ -521,11 +661,24 @@ export default function CompareSizesPage() {
                 className="cmp-btn-l"
                 onClick={handleSelectSizeL}
               >
-                <span>{selectedWinner === "L" ? "Selected Size L ✓" : "Select Size L"}</span>
+                <span>{selectedWinner === "L" ? t.btnLSelected : t.btnL}</span>
               </button>
             </div>
           </div>
         </div>
+
+        {/* Dynamic Toast Feedback Notification */}
+        {toastMsg && (
+          <div className="cat-toast-banner">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" strokeWidth="2">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <span>{toastMsg.text}</span>
+            <Link href={toastMsg.link} className="cat-toast-link">
+              {toastMsg.linkText}
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
