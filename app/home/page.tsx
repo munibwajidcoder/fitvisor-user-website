@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
+import WelcomeFooter from "@/components/WelcomeFooter";
 
 const translations = {
   EN: {
@@ -681,6 +682,7 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+      <WelcomeFooter lang={lang} />
     </div>
   );
 }

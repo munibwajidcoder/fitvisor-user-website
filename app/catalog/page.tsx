@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import WelcomeFooter from "@/components/WelcomeFooter";
 
 const translations = {
   EN: {
@@ -750,6 +751,7 @@ export default function CatalogPage() {
           </div>
         )}
       </div>
+      <WelcomeFooter lang={lang} />
     </div>
   );
 }

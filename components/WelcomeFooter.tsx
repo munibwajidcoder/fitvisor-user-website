@@ -1,9 +1,97 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Logo from "./Logo";
 
-export default function WelcomeFooter() {
+const footerTranslations = {
+  EN: {
+    brandDesc: "FitVisor delivers virtual try-on with true precision. Centimeter-accurate 3D digital twins and real-time neural fabric simulation to eliminate online fashion return uncertainty.",
+    fitPrecision: "99% Fit Precision",
+    aesVault: "AES-256 Vault",
+    colTech: "3D Technology",
+    bodyScan: "3-Photo Body Scan",
+    ai2min: "AI 2 Min",
+    pedestalStudio: "360° Virtual Pedestal Studio",
+    tensionMap: "Fabric Tension Heatmap",
+    layering: "Multi-Garment Layering",
+    compareSizes: "Size M vs L Comparison",
+    colBrands: "Partner Brands & Retail",
+    collections: "Partner Collections (Balmain • Zalando)",
+    reservation: "In-Store Fitting Reservation",
+    kiosks: "Interactive Boutique Kiosks",
+    membership: "Membership Plans (Free • Pro)",
+    colPrivacy: "Privacy & GDPR",
+    biometricVault: "Biometric Data Vault",
+    anonMode: "Anonymous Mode (Face Blur)",
+    rightToForget: "Right to be Forgotten (Art. 17)",
+    consentMgmt: "Consent Management",
+    exportMesh: "Export 3D Mesh & JSON",
+    copyright: "© 2026 FitVisor. All rights reserved.",
+    gdprNotice: "GDPR / RGPD Article 17 Compliant • Your data stays encrypted",
+    cookieSettings: "Cookie Settings",
+    terms: "Terms & Conditions",
+    privacyPolicy: "Privacy Policy",
+  },
+  FR: {
+    brandDesc: "FitVisor réinvente l'essayage virtuel avec une précision absolue. Jumeaux numériques 3D au centimètre près et simulation physique temps réel pour éliminer l'incertitude des retours.",
+    fitPrecision: "Précision de coupe 99%",
+    aesVault: "Coffre AES-256",
+    colTech: "Technologie 3D",
+    bodyScan: "Scan corporel 3 photos",
+    ai2min: "IA 2 Min",
+    pedestalStudio: "Studio piédestal virtuel 360°",
+    tensionMap: "Carte thermique des tensions",
+    layering: "Superposition multi-vêtements",
+    compareSizes: "Comparaison des tailles M vs L",
+    colBrands: "Marques partenaires & Boutiques",
+    collections: "Collections partenaires (Balmain • Zalando)",
+    reservation: "Réservation d'essayage en boutique",
+    kiosks: "Bornes interactives en boutique",
+    membership: "Formules d'abonnement (Gratuit • Pro)",
+    colPrivacy: "Confidentialité & RGPD",
+    biometricVault: "Coffre de données biométriques",
+    anonMode: "Mode anonyme (Visage flouté)",
+    rightToForget: "Droit à l'oubli (Art. 17)",
+    consentMgmt: "Gestion des consentements",
+    exportMesh: "Exporter maillage 3D & JSON",
+    copyright: "© 2026 FitVisor. Tous droits réservés.",
+    gdprNotice: "Conforme RGPD Article 17 • Vos données restent chiffrées",
+    cookieSettings: "Paramètres des cookies",
+    terms: "Conditions Générales",
+    privacyPolicy: "Politique de confidentialité",
+  },
+};
+
+interface WelcomeFooterProps {
+  lang?: "EN" | "FR";
+}
+
+export default function WelcomeFooter({ lang: propLang }: WelcomeFooterProps) {
+  const [currentLang, setCurrentLang] = useState<"EN" | "FR">("EN");
+
+  useEffect(() => {
+    if (propLang) {
+      setCurrentLang(propLang);
+      return;
+    }
+    const saved = localStorage.getItem("fitvisor_lang");
+    if (saved === "EN" || saved === "FR") {
+      setCurrentLang(saved);
+    }
+    const handleStorage = () => {
+      const updated = localStorage.getItem("fitvisor_lang");
+      if (updated === "EN" || updated === "FR") {
+        setCurrentLang(updated);
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [propLang]);
+
+  const activeLang = propLang || currentLang;
+  const t = footerTranslations[activeLang] || footerTranslations.EN;
+
   return (
     <footer className="wft-footer-wrapper">
       <div className="wft-footer-inner">
@@ -14,19 +102,19 @@ export default function WelcomeFooter() {
           
           {/* COLUMN 1: Brand & Core Mission */}
           <div className="wft-brand-col">
-            <Logo size="sm" showSubtitle={true} />
+            <Logo size="sm" showSubtitle={true} href="/home" />
             <p className="wft-brand-desc">
-              <strong>FitVisor</strong> delivers virtual try-on with true precision. Centimeter-accurate 3D digital twins and real-time neural fabric simulation to eliminate online fashion return uncertainty.
+              <strong>FitVisor</strong> {t.brandDesc}
             </p>
 
             <div className="wft-trust-chips">
               <div className="wft-trust-chip">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>99% Fit Precision</span>
+                <span>{t.fitPrecision}</span>
               </div>
               <div className="wft-trust-chip">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>AES-256 Vault</span>
+                <span>{t.aesVault}</span>
               </div>
             </div>
 
@@ -48,32 +136,32 @@ export default function WelcomeFooter() {
 
           {/* COLUMN 2: 3D Technology */}
           <div className="wft-nav-col">
-            <h4 className="wft-col-title">3D Technology</h4>
+            <h4 className="wft-col-title">{t.colTech}</h4>
             <ul className="wft-link-list">
               <li>
                 <Link href="/scan" className="wft-link">
-                  3-Photo Body Scan
-                  <span className="wft-tag-pill wft-tag-green">AI 2 Min</span>
+                  {t.bodyScan}
+                  <span className="wft-tag-pill wft-tag-green">{t.ai2min}</span>
                 </Link>
               </li>
               <li>
                 <Link href="/3d-studio" className="wft-link">
-                  360&deg; Virtual Pedestal Studio
+                  {t.pedestalStudio}
                 </Link>
               </li>
               <li>
                 <Link href="/3d-studio/tension" className="wft-link">
-                  Fabric Tension Heatmap
+                  {t.tensionMap}
                 </Link>
               </li>
               <li>
                 <Link href="/3d-studio/layering" className="wft-link">
-                  Multi-Garment Layering
+                  {t.layering}
                 </Link>
               </li>
               <li>
                 <Link href="/3d-studio/compare" className="wft-link">
-                  Size M vs L Comparison
+                  {t.compareSizes}
                 </Link>
               </li>
             </ul>
@@ -81,26 +169,26 @@ export default function WelcomeFooter() {
 
           {/* COLUMN 3: Brands & Retail Ecosystem */}
           <div className="wft-nav-col">
-            <h4 className="wft-col-title">Partner Brands &amp; Retail</h4>
+            <h4 className="wft-col-title">{t.colBrands}</h4>
             <ul className="wft-link-list">
               <li>
                 <Link href="/catalog" className="wft-link">
-                  Partner Collections (Balmain &bull; Zalando)
+                  {t.collections}
                 </Link>
               </li>
               <li>
                 <Link href="/checkout" className="wft-link">
-                  In-Store Fitting Reservation
+                  {t.reservation}
                 </Link>
               </li>
               <li>
                 <Link href="/order-success" className="wft-link">
-                  Interactive Boutique Kiosks
+                  {t.kiosks}
                 </Link>
               </li>
               <li>
                 <Link href="/pricing" className="wft-link">
-                  Membership Plans (Free &bull; Pro)
+                  {t.membership}
                 </Link>
               </li>
             </ul>
@@ -108,32 +196,32 @@ export default function WelcomeFooter() {
 
           {/* COLUMN 4: Privacy & GDPR */}
           <div className="wft-nav-col">
-            <h4 className="wft-col-title">Privacy &amp; GDPR</h4>
+            <h4 className="wft-col-title">{t.colPrivacy}</h4>
             <ul className="wft-link-list">
               <li>
                 <Link href="/profile" className="wft-link">
-                  Biometric Data Vault
+                  {t.biometricVault}
                   <span className="wft-tag-pill">AES-256</span>
                 </Link>
               </li>
               <li>
                 <Link href="/profile" className="wft-link">
-                  Anonymous Mode (Face Blur)
+                  {t.anonMode}
                 </Link>
               </li>
               <li>
                 <Link href="/profile" className="wft-link">
-                  Right to be Forgotten (Art. 17)
+                  {t.rightToForget}
                 </Link>
               </li>
               <li>
                 <Link href="/profile" className="wft-link">
-                  Consent Management
+                  {t.consentMgmt}
                 </Link>
               </li>
               <li>
                 <Link href="/profile" className="wft-link">
-                  Export 3D Mesh &amp; JSON
+                  {t.exportMesh}
                 </Link>
               </li>
             </ul>
@@ -148,7 +236,7 @@ export default function WelcomeFooter() {
       <div className="wft-bottom-strip">
         <div className="wft-bottom-inner">
           <p className="wft-copyright">
-            &copy; 2026 FitVisor. All rights reserved.
+            {t.copyright}
           </p>
 
           <div className="wft-gdpr-center">
@@ -156,20 +244,20 @@ export default function WelcomeFooter() {
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               <path d="m9 12 2 2 4-4" />
             </svg>
-            <span className="wft-gdpr-text">GDPR / RGPD Article 17 Compliant &bull; Your data stays encrypted</span>
+            <span className="wft-gdpr-text">{t.gdprNotice}</span>
           </div>
 
           <div className="wft-bottom-links">
             <Link href="/profile" className="wft-legal-link">
-              Cookie Settings
+              {t.cookieSettings}
             </Link>
             <span className="wft-pipe">|</span>
             <Link href="/profile" className="wft-legal-link">
-              Terms &amp; Conditions
+              {t.terms}
             </Link>
             <span className="wft-pipe">|</span>
             <Link href="/profile" className="wft-legal-link">
-              Privacy Policy
+              {t.privacyPolicy}
             </Link>
           </div>
         </div>
