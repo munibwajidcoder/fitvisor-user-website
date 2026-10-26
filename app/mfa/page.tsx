@@ -79,7 +79,7 @@ export default function MFAPage() {
       alert("Please enter the complete 6-digit code.");
       return;
     }
-    router.push("/register");
+    router.push("/home");
   };
 
   return (

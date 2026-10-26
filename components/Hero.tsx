@@ -38,21 +38,21 @@ export default function Hero() {
           Say goodbye to 70% of online returns.
         </p>
         <div className="hero-actions">
-          <Link href="/login" className="btn-start-scan">
+          <Link href="/register" className="btn-start-scan">
             <span>Start Free 3D Scan</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
             </svg>
           </Link>
-          <button className="btn-explore-demo">
+          <Link href="/home" className="btn-explore-demo" style={{ textDecoration: "none" }}>
             <span className="play-icon-badge">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="#1e293b">
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
             </span>
             <span>Explore Demo</span>
-          </button>
+          </Link>
         </div>
       </div>
 

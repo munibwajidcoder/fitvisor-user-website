@@ -142,11 +142,11 @@ export default function CommunityPage() {
         {/* ================= HEADER / NAVBAR ================= */}
         <header className="cat-navbar" style={{ marginBottom: "28px" }}>
           <div className="cat-nav-brand">
-            <Logo size="md" />
+            <Logo size="md" href="/home" />
           </div>
 
           <nav className="cat-nav-menu">
-            <Link href="/" className="cat-nav-item">
+            <Link href="/home" className="cat-nav-item">
               Home
             </Link>
             <Link href="/catalog" className="cat-nav-item">

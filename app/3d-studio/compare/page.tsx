@@ -186,12 +186,12 @@ export default function CompareSizesPage() {
         <header className="cat-navbar" style={{ marginBottom: "24px" }}>
           {/* Brand Logo - Row 1 Left */}
           <div className="cat-nav-brand">
-            <Logo size="md" />
+            <Logo size="md" href="/home" />
           </div>
 
           {/* Nav Links - Center (Desktop) / Row 3 (Mobile) */}
           <nav className="cat-nav-menu">
-            <Link href="/" className="cat-nav-item">
+            <Link href="/home" className="cat-nav-item">
               {t.navHome}
             </Link>
             <Link href="/catalog" className="cat-nav-item">

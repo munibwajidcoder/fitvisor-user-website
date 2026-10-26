@@ -8,9 +8,10 @@ interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
   height?: number;
   showSubtitle?: boolean;
+  href?: string;
 }
 
-export default function Logo({ size = "md", height: customHeight, showSubtitle = false, className = "" }: LogoProps) {
+export default function Logo({ size = "md", height: customHeight, showSubtitle = false, className = "", href = "/" }: LogoProps) {
   // Height based on size
   const height = customHeight ?? (size === "sm" ? 24 : size === "lg" ? 38 : size === "xl" ? 44 : 32);
   // Aspect ratio 780 x 168 = 4.643
@@ -18,7 +19,7 @@ export default function Logo({ size = "md", height: customHeight, showSubtitle =
 
   return (
     <Link 
-      href="/" 
+      href={href} 
       className={`fitvisor-brand-logo ${className}`} 
       style={{ 
         display: "inline-flex", 

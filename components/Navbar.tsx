@@ -57,7 +57,10 @@ export default function Navbar() {
           </button>
         </div>
 
-        <Link href="/login" className="btn-primary-cta">
+        <Link href="/login" style={{ fontSize: "13.5px", fontWeight: 600, color: "#1e293b", textDecoration: "none", marginRight: "4px" }}>
+          {lang === "FR" ? "Connexion" : "Sign In"}
+        </Link>
+        <Link href="/register" className="btn-primary-cta">
           {lang === "FR" ? "Créer mon avatar" : "Create My Avatar"}
         </Link>
       </div>

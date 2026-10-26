@@ -363,7 +363,7 @@ export default function DigitalTwinPage() {
           </button>
 
           {/* Primary CTA: Start Shopping & 3D Try-On */}
-          <Link href="/" className="dt-start-tryon-btn">
+          <Link href="/home" className="dt-start-tryon-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="8" cy="21" r="1" />
               <circle cx="19" cy="21" r="1" />

@@ -103,11 +103,11 @@ export default function OrderSuccessPage() {
         {/* ================= HEADER / NAVBAR ================= */}
         <header className="cat-navbar" style={{ marginBottom: "26px" }}>
           <div className="cat-nav-brand">
-            <Logo size="md" />
+            <Logo size="md" href="/home" />
           </div>
 
           <nav className="cat-nav-menu">
-            <Link href="/" className="cat-nav-item">
+            <Link href="/home" className="cat-nav-item">
               {t.navHome}
             </Link>
             <Link href="/catalog" className="cat-nav-item">
